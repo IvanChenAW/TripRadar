@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>TripRadar｜App 介面（GitHub Pages）</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800&display=swap" rel="stylesheet">
+<meta name="description" content="TripRadar：行前 1 分鐘，一眼看出旅遊舒適度。結合氣象署與環境部 OpenData，自動計算建議旅遊分數與一句建議。">
+<style>
+:root{--bg:#F6F8FB;--card:#fff;--ink:#0f172a;--muted:#64748b;--blue:#1F6FEB;--green:#16a34a;--teal:#22c55e;--amber:#f59e0b;--red:#ef4444;--shadow:0 10px 28px rgba(2,6,23,.08)}
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang TC","Microsoft JhengHei",sans-serif}
+.wrap{display:flex;justify-content:center}
+.phone{width:100%;max-width:430px;min-height:100dvh;background:linear-gradient(#fff,#fff0)}
+.header{position:sticky;top:0;z-index:10;background:linear-gradient(#fff,#ffffffd0);backdrop-filter:saturate(1.2) blur(6px);padding:16px 16px 10px;border-bottom:1px solid #e5e7eb}
+.h1{margin:0;font-size:20px;font-weight:800} .sub{margin:4px 0 0;color:var(--muted);font-size:12px}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0 0}
+select,.switch,.pill{border:1px solid #d1d5db;background:#fff;border-radius:12px;padding:6px 10px;font-size:13px}
+.badge{border:1px solid #c7d2fe;background:#eef2ff;color:#1e293b;border-radius:999px;padding:4px 10px;font-size:12px}
+.status{margin:10px 16px;color:#334155;background:#f1f5f9;border:1px dashed #cbd5e1;padding:10px;border-radius:12px}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;padding:12px 16px 90px}
+.card{background:var(--card);border:1px solid #e5e7eb;border-radius:16px;box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.title{font-weight:800}
+.tip{color:var(--muted);font-size:12px}
+.score{padding:6px 10px;border-radius:999px;color:#fff;font-weight:800;font-size:12px}
+.score.good{background:var(--green)} .score.ok{background:var(--teal)} .score.warn{background:var(--amber)} .score.bad{background:var(--red)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12px;background:#eef2ff;color:#3730a3;padding:4px 8px;border-radius:999px;border:1px solid #c7d2fe}
+.btn{width:100%;border:none;background:var(--blue);color:#fff;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer}
+.footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e5e7eb;padding:8px 16px;color:#muted;font-size:12px}
+.nav{position:fixed;left:0;right:0;bottom:42px;background:#fff;border-top:1px solid #e5e7eb;display:flex;gap:8px;justify-content:space-around;padding:10px 8px}
+.nav button{flex:1;border:none;background:#f3f4f6;border-radius:12px;padding:10px 0}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#334155;margin:0 16px 8px}
+.legend .b{display:flex;align-items:center;gap:6px}
+.legend .dot{width:10px;height:10px;border-radius:999px;display:inline-block}
+.dot.g{background:#16a34a}.dot.o{background:#22c55e}.dot.y{background:#f59e0b}.dot.r{background:#ef4444}
+/* modal */
+.backdrop{position:fixed;inset:0;background:rgba(15,23,42,.35);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal{max-width:430px;width:100%;background:#fff;border-radius:16px;box-shadow:0 30px 80px rgba(2,6,23,.25);overflow:hidden;border:1px solid #e5e7eb}
+.modal header{padding:12px 14px;border-bottom:1px solid #e5e7eb}
+.modal main{padding:14px}
+.block{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px;margin-top:10px}
+.kv{display:flex;gap:6px;flex-wrap:wrap}
+.k{background:#eef2ff;border:1px solid #c7d2fe;border-radius:999px;padding:4px 8px;font-size:12px;color:#1e293b}
+.close{float:right;border:1px solid #d1d5db;background:#fff;border-radius:10px;padding:4px 8px}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="phone">
+  <div class="header">
+    <div class="row">
+      <div>
+        <div class="h1">TripRadar</div>
+        <div class="sub">行前 1 分鐘｜建議旅遊分數 + 一句建議</div>
+      </div>
+      <div class="badge" id="ts">更新時間：—</div>
+    </div>
+    <div class="controls">
+      <label class="switch"><input type="checkbox" id="useLoc" checked> 使用所在地加權</label>
+      <label>手動所在地：
+        <select id="manualCounty">
+          <option>臺北市</option><option>新北市</option><option>基隆市</option><option>桃園市</option>
+          <option>新竹市</option><option>新竹縣</option><option>苗栗縣</option><option>臺中市</option>
+          <option>彰化縣</option><option>南投縣</option><option>雲林縣</option><option>嘉義市</option><option>嘉義縣</option>
+          <option>臺南市</option><option>高雄市</option><option>屏東縣</option><option>宜蘭縣</option>
+          <option>花蓮縣</option><option>臺東縣</option><option>澎湖縣</option><option>金門縣</option><option>連江縣</option>
+        </select>
+      </label>
+      <span class="pill" id="mode">資料來源：CWB / MoENV / NCDR</span>
+      <button class="pill" id="retry">重新抓取</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="b"><span class="dot g"></span> ≥90 非常適合出遊</div>
+    <div class="b"><span class="dot o"></span> 75–89 適合出遊</div>
+    <div class="b"><span class="dot y"></span> 60–74 尚可出遊</div>
+    <div class="b"><span class="dot r"></span> &lt;60 建議改期</div>
+  </div>
+
+  <div class="status" id="status">正在連線抓取資料…</div>
+  <div class="cards" id="cards"></div>
+
+  <div class="nav">
+    <button data-tab="首頁">首頁</button>
+    <button data-tab="探索">探索</button>
+    <button data-tab="設定">設定</button>
+  </div>
+  <div class="footer">© 2025 TripRadar（DEMO）。本頁為 GitHub Pages 展示用；若網路不穩，系統會以快取示意值呈現。</div>
+</div></div>
+
+<!-- 詳細頁 Modal -->
+<div class="backdrop" id="backdrop" role="dialog" aria-modal="true">
+  <div class="modal">
+    <header>
+      <b id="m-title">景區</b>
+      <button class="close" id="m-close">關閉 ×</button>
+      <div class="sub" id="m-county">—</div>
+    </header>
+    <main>
+      <div class="block">
+        <b>即時指標</b>
+        <div class="kv" id="m-kv" style="margin-top:6px"></div>
+        <div style="margin-top:6px;color:#64748b;font-size:12px" id="m-ts">資料時間：—</div>
+      </div>
+      <div class="block">
+        <b>分數拆解</b>
+        <div id="m-break" style="margin-top:6px;font-size:14px;color:#334155"></div>
+      </div>
+      <div class="block">
+        <b>熱門活動（模擬）</b>
+        <ul id="m-events" style="margin:6px 0 0 18px"></ul>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+/* ===== OpenData 來源 ===== */
+const CWB_KEY = "CWA-CD72AADF-7D43-445F-AFB8-A3F62F548EBF"; // 可自行更換
+const CWB_FORECAST = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=${CWB_KEY}`;
+const CWB_UVI      = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0005-001?Authorization=${CWB_KEY}&format=JSON`;
+const AQI_URL      = "https://data.moenv.gov.tw/api/v2/aqx_p_432?format=json";
+const CAP_URL      = "https://alerts.ncdr.nat.gov.tw/JSONAtomFeeds";
+
+/* 13 風景區 */
+const AREA = {
+ "阿里山":{county:"嘉義縣",lat:23.5,lng:120.8},
+ "太魯閣":{county:"花蓮縣",lat:24.2,lng:121.5},
+ "日月潭":{county:"南投縣",lat:23.86,lng:120.91},
+ "西拉雅":{county:"臺南市",lat:23.2,lng:120.4},
+ "馬祖":{county:"連江縣",lat:26.16,lng:119.95,island:true},
+ "澎湖":{county:"澎湖縣",lat:23.57,lng:119.56,island:true},
+ "東部海岸":{county:"臺東縣",lat:22.9,lng:121.2},
+ "花東縱谷":{county:"花蓮縣",lat:23.6,lng:121.4},
+ "金門":{county:"金門縣",lat:24.45,lng:118.38,island:true},
+ "茂林":{county:"高雄市",lat:22.9,lng:120.7},
+ "雲嘉南濱海":{county:"臺南市",lat:23.2,lng:120.1},
+ "北海岸及觀音山":{county:"新北市",lat:25.28,lng:121.5},
+ "東北角暨宜蘭海岸":{county:"宜蘭縣",lat:24.9,lng:121.8}
+};
+const COUNTY_CENTER = {
+ "臺北市":[25.04,121.56],"新北市":[25.05,121.46],"基隆市":[25.13,121.74],"桃園市":[24.99,121.31],
+ "新竹市":[24.80,120.97],"新竹縣":[24.74,121.10],"苗栗縣":[24.56,120.82],"臺中市":[24.16,120.67],
+ "彰化縣":[24.07,120.54],"南投縣":[23.91,120.69],"雲林縣":[23.71,120.54],"嘉義縣":[23.45,120.25],
+ "嘉義市":[23.48,120.44],"臺南市":[23.00,120.22],"高雄市":[22.63,120.30],"屏東縣":[22.55,120.62],
+ "宜蘭縣":[24.75,121.75],"花蓮縣":[23.99,121.60],"臺東縣":[22.80,121.14],
+ "澎湖縣":[23.57,119.56],"金門縣":[24.45,118.38],"連江縣":[26.16,119.95]
+};
+
+/* 小工具 */
+const $=q=>document.querySelector(q), $$=q=>Array.from(document.querySelectorAll(q));
+function toNum(v){ const n=Number(v); return isFinite(n)?n:null; }
+function avg(a,b){ if(a==null&&b==null)return null; if(a==null)return b; if(b==null)return a; return Math.round((a+b)/2); }
+function pick(elements, key){
+  const el = elements?.find(e=>e.elementName===key);
+  const val = el?.time?.find?.(t => t?.parameter?.parameterName!=null)?.parameter?.parameterName;
+  return val ?? null;
+}
+function haversine(a,b){ const R=6371, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180;
+  const s1=Math.sin(dLat/2)**2 + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(s1));
+}
+
+/* 計分 */
+const W={ temp:0.25, rain:0.35, aqi:0.25, uv:0.15 };
+const TH={ good:90, ok:75, warn:60 };
+function baseScore(w){
+  const t=(w.temp!=null)?((w.temp>=18&&w.temp<=28)?100:Math.max(0,100-Math.abs(w.temp-23)*6)):70;
+  const r=(w.pop!=null)?(100-Math.min(100,w.pop)):70;
+  const a=(w.aqi!=null)?Math.max(0,100-(w.aqi*0.8)):70;
+  const u=(w.uv!=null)?Math.max(0,100-(w.uv*10)):70;
+  const s=Math.round(t*W.temp + r*W.rain + a*W.aqi + u*W.uv);
+  let tag="ok"; if(s>=TH.good)tag="good"; else if(s>=TH.ok)tag="ok"; else if(s>=TH.warn)tag="warn"; else tag="bad";
+  return {score:s, tag, parts:{t,r,a,u}};
+}
+function advice(tag){ return tag==="good"?"非常適合出遊":tag==="ok"?"適合出遊":tag==="warn"?"尚可出遊":"改天再去會更好"; }
+function scoreClass(s){ if(s>=TH.good)return"good"; if(s>=TH.ok)return"ok"; if(s>=TH.warn)return"warn"; return"bad"; }
+
+/* 所在地加權 */
+function weighting(raw, areaCounty, areaMeta){
+  if(!$("#useLoc").checked) return {adj:raw, delta:0, reason:"（未套用）"};
+  const uc=$("#manualCounty").value||"臺北市";
+  let delta=0, reason=[];
+  if(uc===areaCounty){ delta+=5; reason.push("同縣市 +5"); }
+  else{
+    const aPt={lat:COUNTY_CENTER[areaCounty][0],lng:COUNTY_CENTER[areaCounty][1]};
+    const uPt={lat:COUNTY_CENTER[uc][0],lng:COUNTY_CENTER[uc][1]};
+    const d=haversine(uPt,aPt);
+    if(d<120){ delta+=2; reason.push("近距 +2"); }
+    else if(d>=200){ delta-=5; reason.push("遠距 -5"); }
+  }
+  const userIsland=["澎湖縣","金門縣","連江縣"].includes(uc);
+  const areaIsland=!!areaMeta.island;
+  if(userIsland!==areaIsland){ delta-=10; reason.push("離島成本 -10"); }
+  return {adj:Math.max(0,Math.min(100,raw+delta)), delta, reason:reason.join("、")||"—"};
+}
+
+/* 連線 */
+async function getForecast(){
+  const r=await fetch(CWB_FORECAST); if(!r.ok) throw new Error("CWB 預報失敗");
+  const j=await r.json(); const out={};
+  for(const loc of (j?.records?.location||[])){
+    const c = loc.locationName;
+    const pop12 = pick(loc.weatherElement,"PoP12h");
+    const minT = toNum(pick(loc.weatherElement,"MinT"));
+    const maxT = toNum(pick(loc.weatherElement,"MaxT"));
+    out[c] = { temp:avg(minT,maxT), pop:toNum(pop12) };
+  }
+  return out;
+}
+async function getUVI(){
+  const r=await fetch(CWB_UVI); if(!r.ok) throw new Error("CWB UVI 失敗");
+  const j=await r.json(); const rows=j?.records?.location||j?.records?.station||j?.records||[], agg={};
+  for(const row of rows){
+    const c=row.parameter?.[0]?.parameterValue||row.county||row.locationName||row.parameter?.find?.(p=>p.parameterName==="COUNTY")?.parameterValue;
+    const u=Number(row.weatherElement?.[0]?.elementValue||row.UVI||row.value);
+    if(!c||!isFinite(u)) continue; if(!agg[c]) agg[c]={sum:0,n:0}; agg[c].sum+=u; agg[c].n++;
+  }
+  const out={}; for(const k in agg) out[k]=Math.round((agg[k].sum/agg[k].n)*10)/10; return out;
+}
+async function getAQI(){
+  const r=await fetch(AQI_URL); if(!r.ok) throw new Error("AQI 失敗");
+  const j=await r.json(); const out={};
+  for(const row of (j?.records||[])){ const c=row.County||row.county, a=Number(row.AQI||row.aqi);
+    if(!c||!isFinite(a)) continue; if(!out[c]) out[c]={sum:0,n:0}; out[c].sum+=a; out[c].n++;
+  }
+  const avg={}; for(const k in out) avg[k]=Math.round(out[k].sum/out[k].n); return avg;
+}
+async function getCAP(){
+  try{ const r=await fetch(CAP_URL); if(!r.ok) throw 0; const j=await r.json();
+    const arr=j?.entries||j?.feed||j||[]; return (arr.slice?arr.slice(0,3):[]).map(x=>x.title||x.summary||x.id).filter(Boolean);
+  }catch{ return []; }
+}
+
+/* 渲染 */
+const cardsEl=$("#cards"); let capTitles=[];
+function render(dataset, mode="連線"){
+  cardsEl.innerHTML="";
+  const ts=new Date().toISOString().slice(0,16).replace("T"," ");
+  $("#ts").textContent=`更新時間：${ts}（${mode}）`;
+  $("#status").style.display="none";
+  Object.entries(AREA).forEach(([name,meta])=>{
+    const county=meta.county;
+    const w={
+      temp:dataset.weather?.[county]?.temp ?? null,
+      pop: dataset.weather?.[county]?.pop ?? null,
+      uv:  dataset.uvi?.[county] ?? 6,
+      aqi: dataset.aqi?.[county] ?? null
+    };
+    const b=baseScore(w);
+    const {adj,delta,reason}=weighting(b.score, county, meta);
+
+    const card=document.createElement("div"); card.className="card";
+    card.innerHTML=`
+      <div class="row">
+        <div class="title">${name}</div>
+        <div class="score ${scoreClass(adj)}">建議旅遊分數 ${adj}</div>
+      </div>
+      <div class="tip">${advice(scoreClass(adj))}｜原始 ${b.score}${delta?`（Δ${delta}）`:''}</div>
+      <div class="chips">
+        <div class="chip">🌡️ ${w.temp!=null?w.temp+"°C":"—"}</div>
+        <div class="chip">☔ ${w.pop!=null?w.pop+"%":"—"}</div>
+        <div class="chip">🔆 ${w.uv!=null?w.uv:"—"}</div>
+        <div class="chip">🫧 AQI ${w.aqi!=null?w.aqi:"—"}</div>
+        <div class="chip">${county}${capTitles.some(tt=>tt && tt.includes(county))?"｜CAP":""}</div>
+      </div>
+      <button class="btn open">查看</button>
+    `;
+    card.querySelector(".open").addEventListener("click",()=>openModal(name, county, w, b, adj, delta, reason));
+    cardsEl.appendChild(card);
+  });
+}
+function openModal(name, county, w, baseObj, adj, delta, reason){
+  $("#m-title").textContent=name; $("#m-county").textContent=county;
+  $("#m-kv").innerHTML=`
+    <span class="k">T ${w.temp!=null?w.temp+"°C":"—"}</span>
+    <span class="k">POP ${w.pop!=null?w.pop+"%":"—"}</span>
+    <span class="k">UV ${w.uv!=null?w.uv:"—"}</span>
+    <span class="k">AQI ${w.aqi!=null?w.aqi:"—"}</span>
+    <span class="k">原始 ${baseObj.score}</span>
+    <span class="k">加權 ${adj}（Δ${delta}｜${reason}）</span>`;
+  $("#m-ts").textContent=$("#ts").textContent;
+  $("#m-break").textContent=`溫度×${W.temp}, 降雨×${W.rain}, 空品×${W.aqi}, UV×${W.uv} → ${baseObj.score}，再套所在地加權 Δ${delta} = ${adj}`;
+  const mock = {"嘉義縣":["阿里山日出","林鐵市集"],"花蓮縣":["太魯閣步道日"],"南投縣":["日月潭花火"],"臺南市":["西拉雅蕎麥季"],
+    "連江縣":["藍眼淚季"],"澎湖縣":["澎湖花火"],"臺東縣":["東海岸藝術節"],"金門縣":["戰地導覽"],"高雄市":["茂林紫蝶"]};
+  const ul=$("#m-events"); ul.innerHTML=""; (mock[county]||["（目前無資料）"]).forEach(s=>{ const li=document.createElement("li"); li.textContent=s; ul.appendChild(li); });
+  $("#backdrop").style.display="flex";
+}
+$("#m-close").addEventListener("click",()=>$("#backdrop").style.display="none");
+$("#backdrop").addEventListener("click",(e)=>{ if(e.target.id==="backdrop") $("#backdrop").style.display="none"; });
+
+/* 載入流程 */
+function showErr(msg){
+  const s=$("#status"); s.className="status"; s.textContent="連線發生問題："+msg+"（以快取值呈現）";
+  $("#mode").textContent="狀態：快取";
+}
+async function load(){
+  $("#status").className="status"; $("#status").textContent="正在連線抓取資料…";
+  $("#mode").textContent="資料來源：CWB / MoENV / NCDR";
+  try{
+    const [weather, aqi, uvi, caps] = await Promise.all([getForecast(), getAQI(), getUVI(), getCAP()]);
+    capTitles = caps || [];
+    render({weather, aqi, uvi}, "連線");
+  }catch(e){
+    console.error(e); showErr(e.message||e);
+    const weather={}, aqi={}, uvi={};
+    Object.values(AREA).forEach(m=>{ weather[m.county]={temp:24,pop:20}; aqi[m.county]=45; uvi[m.county]=6; });
+    capTitles=[];
+    render({weather, aqi, uvi}, "快取");
+  }
+}
+$("#retry").addEventListener("click",load);
+$("#useLoc").addEventListener("change",load);
+$("#manualCounty").addEventListener("change",load);
+window.addEventListener("DOMContentLoaded",()=>{ load(); $$('.nav button').forEach(n=> n.onclick=()=>alert('示意：'+n.dataset.tab)); });
+</script>
+</body>
+</html>
