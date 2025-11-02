@@ -2,389 +2,359 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>TripRadar｜App 介面（DEMO）</title>
-
-  <!-- 防快取，避免手機顯示舊版 -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-
-  <!-- 字體 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&display=swap" rel="stylesheet" />
-
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>TripRadar｜App 介面（v5.2）</title>
+  <meta name="description" content="行前1分鐘，一眼看出旅遊舒適度 | TripRadar DEMO" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root{
       --ink:#0d1b2a;
       --muted:#5b6b7a;
+      --card:#ffffff;
       --bg:#f6f8fb;
-      --card:#fff;
-      --prim:#2f6feb; /* 主藍 */
-      --accent:#2ea043; /* 成功綠 */
-      --amber:#f2a500; /* 琥珀黃 */
-      --danger:#e14d4d; /* 紅色 */
-      --chip:#eef2f7;
-      --radius:16px;
+      --brand:#2d6cdf;
+      --chip:#eef2ff;
+      --chip-ink:#1f2a44;
+
+      /* score colors */
+      --green:#22c55e;
+      --blue:#3b82f6;
+      --amber:#f59e0b;
+      --red:#ef4444;
+
+      --shadow:0 10px 30px rgba(13,27,42,.06);
+      --radius:18px;
     }
-    *,*:before,*:after{box-sizing:border-box}
+
+    *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      background:var(--bg);
+      font-family:"Noto Sans TC",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang TC","Microsoft JhengHei",sans-serif;
       color:var(--ink);
-      font-family:"Noto Sans TC", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-      line-height:1.45;
+      background:var(--bg);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
 
-    /* 頂部 */
-    header{
-      position:sticky;top:0;z-index:10;
-      background:linear-gradient(180deg,#2856d3, #2f6feb);
+    .appbar{
+      position:sticky;top:0;z-index:30;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:12px;padding:14px 18px;
+      background:linear-gradient(180deg,#0f172a 0%, #1e293b 60%, #233146 100%);
       color:#fff;
-      padding:14px 20px;
-      box-shadow:0 6px 16px rgba(13,27,42,.15);
+      box-shadow:var(--shadow);
     }
-    header .title{
-      font-weight:900;letter-spacing:.5px;font-size:24px;
-    }
-    header .subtitle{
-      opacity:.9;font-size:14px;margin-top:2px
-    }
-    header .toolbar{
-      margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center
-    }
-    .pill{
-      background:rgba(255,255,255,.14);
-      border:1px solid rgba(255,255,255,.25);
-      padding:8px 12px;border-radius:999px;
-      display:inline-flex;align-items:center;gap:8px;font-size:14px
-    }
-    .btn-refresh{
-      background:#fff;color:#1f2328;border:none;cursor:pointer;
-      border-radius:999px;padding:8px 14px;font-weight:700
-    }
+    .brand{font-size:22px;font-weight:800;letter-spacing:.5px}
+    .sub{opacity:.8;font-size:13px}
 
-    main{padding:16px}
-
-    /* 篩選 */
-    .filters{
-      display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-      margin-bottom:8px
+    .container{max-width:980px;margin:22px auto;padding:0 14px}
+    .toolbar{
+      display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+      padding:14px;background:#fff;border-radius:16px;box-shadow:var(--shadow)
     }
-    .select, .switch{
-      background:var(--card); border:1px solid #e5e9f0;
-      border-radius:12px;padding:8px 12px
-    }
-    select{
-      font-size:16px; border:none; background:transparent; outline:none
-    }
-    label.switch{display:flex;align-items:center;gap:8px}
-    .muted{color:var(--muted)}
-
-    /* 卡片 */
-    .grid{
-      display:grid; gap:16px;
-      grid-template-columns:repeat(1, minmax(0,1fr));
-    }
-    @media (min-width:680px){
-      .grid{grid-template-columns:repeat(2, minmax(0,1fr))}
-    }
-    @media (min-width:980px){
-      .grid{grid-template-columns:repeat(3, minmax(0,1fr))}
-    }
-    .card{
-      background:var(--card); border:1px solid #e8edf4;
-      border-radius:var(--radius); padding:16px;
-      box-shadow:0 6px 20px rgba(13,27,42,.06);
-    }
-    .card h3{margin:0 0 4px;font-weight:900}
-    .card .sub{color:var(--muted);font-size:14px;margin-bottom:10px}
-
-    .score-badge{
+    .select,.switch,.btn-refresh{
       display:inline-flex;align-items:center;gap:8px;
-      padding:6px 12px;border-radius:999px;color:#fff;
-      font-weight:800;letter-spacing:.5px
+      padding:10px 14px;border-radius:12px;border:1px solid #e6ecf5;background:#fff;
+      color:var(--ink);font-weight:500
     }
-    /* 顏色規則 */
-    .s-green{background:linear-gradient(180deg,#46d391,#09b364)}
-    .s-blue {background:linear-gradient(180deg,#5aa2ff,#2f6feb)}
-    .s-amber{background:linear-gradient(180deg,#ffc64b,#f2a500)}
-    .s-red  {background:linear-gradient(180deg,#ff7878,#e14d4d)}
+    .btn-refresh{background:var(--brand);border-color:transparent;color:#fff}
+    .note{margin-left:auto;color:var(--muted);font-size:13px}
 
-    .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 12px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:16px}
+    .card{
+      background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 16px 12px
+    }
+    .card h3{margin:0 0 10px 0;font-size:20px}
+    .badge{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:6px 12px;border-radius:999px;color:#fff;font-weight:700;font-size:14px
+    }
+    .score-green{background:var(--green)}
+    .score-blue{background:var(--blue)}
+    .score-amber{background:var(--amber)}
+    .score-red{background:var(--red)}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
     .chip{
-      background:var(--chip); border:1px solid #e7ecf4; color:#192734;
-      padding:8px 10px;border-radius:999px; font-weight:700; font-size:14px
+      background:var(--chip);color:var(--chip-ink);border-radius:999px;
+      padding:8px 12px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:6px
     }
-
-    .actions{
-      display:flex;gap:10px;flex-wrap:wrap;margin-top:8px
-    }
+    .actions{display:flex;gap:10px;margin-top:10px}
     .btn{
-      flex:1 1 110px;
-      background:#fff;border:1px solid #dfe6ef;color:#0d1b2a;
-      padding:10px 12px;border-radius:12px;font-weight:800;cursor:pointer
+      flex:1 1 auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:12px;border-radius:12px;border:1px solid #e6ecf5;background:#fff;font-weight:700
     }
-    .btn:hover{border-color:#c8d2df}
-    .btn .emo{font-size:18px;margin-right:6px}
+    .btn .emo{font-size:18px}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:#2563eb;color:#fff;border-color:transparent}
 
-    /* Modal */
-    .modal-backdrop{
-      position:fixed;inset:0;background:rgba(13,27,42,.45);
-      display:none;place-items:center;z-index:50;padding:18px
-    }
-    .modal{max-width:680px;width:100%;background:#fff;border-radius:18px;border:1px solid #e8edf4;box-shadow:0 16px 40px rgba(13,27,42,.24)}
-    .modal header{position:relative;background:#fff;color:#0d1b2a;padding:14px 18px;border-bottom:1px solid #eef2f7;box-shadow:none}
-    .modal header h3{margin:0;font-size:20px;font-weight:900}
-    .modal .content{padding:16px}
-    .modal .close{
-      position:absolute;right:12px;top:10px;border:none;background:#f2f5fa;border:1px solid #e4e9f2;border-radius:10px;padding:6px 10px;font-weight:800;cursor:pointer
-    }
+    .legend{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:16px;color:var(--muted)}
+    .dot{display:inline-flex;align-items:center;gap:8px}
+    .dot i{width:10px;height:10px;border-radius:50%}
+    .green i{background:var(--green)} .blue i{background:var(--blue)} .amber i{background:var(--amber)} .red i{background:var(--red)}
 
-    /* 頁尾小字 */
-    footer{padding:32px 16px;color:#77808c;text-align:center;font-size:12px}
-    .legend{display:flex;gap:22px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:10px}
-    .dot{display:inline-block;width:12px;height:12px;border-radius:50%}
-    .dot.g{background:#46d391} .dot.b{background:#2f6feb}
-    .dot.a{background:#f2a500} .dot.r{background:#e14d4d}
+    footer{
+      margin:26px auto 40px;max-width:980px;padding:0 14px;color:var(--muted);font-size:13px
+    }
+    .small{opacity:.9}
+    .src a{color:var(--brand);text-decoration:none}
   </style>
 </head>
 <body>
-
-  <header>
-    <div class="title">TripRadar</div>
-    <div class="subtitle">行前 1 分鐘｜建議旅遊分數 ＋ 一句建議</div>
-    <div class="toolbar">
-      <span class="pill">更新時間：<span id="ts">—</span>（<span id="mode">快取</span>）</span>
-      <button class="btn-refresh" id="btnReload">重新抓取</button>
+  <header class="appbar">
+    <div>
+      <div class="brand">TripRadar</div>
+      <div class="sub">行前 1 分鐘，一眼看出旅遊舒適度</div>
     </div>
+    <div class="sub" id="lastUpdate">更新時間：—</div>
   </header>
 
-  <main>
-    <div class="filters">
-      <label class="switch">
-        <input type="checkbox" id="useGeo" checked />
-        <span>使用所在地加權</span>
-      </label>
-
-      <div class="select">
-        <span class="muted">手動所在地：</span>
-        <select id="selCity">
+  <main class="container">
+    <div class="toolbar">
+      <label class="switch"><input id="useGeo" type="checkbox" checked> 使用所在址加權</label>
+      <label class="select">手動所在地：
+        <select id="city">
           <option value="臺北市">臺北市</option>
           <option value="新北市">新北市</option>
           <option value="桃園市">桃園市</option>
-          <option value="新竹市" selected>新竹市</option>
-          <option value="新竹縣">新竹縣</option>
+          <option value="新竹市">新竹市</option>
           <option value="臺中市">臺中市</option>
-          <option value="嘉義縣">嘉義縣</option>
           <option value="臺南市">臺南市</option>
           <option value="高雄市">高雄市</option>
-          <option value="屏東縣">屏東縣</option>
-          <option value="宜蘭縣">宜蘭縣</option>
-          <option value="花蓮縣">花蓮縣</option>
-          <option value="臺東縣">臺東縣</option>
-          <option value="連江縣">連江縣</option>
-          <option value="金門縣">金門縣</option>
-          <option value="澎湖縣">澎湖縣</option>
         </select>
-      </div>
+      </label>
+      <button class="btn-refresh" id="btnReload">重新抓取</button>
+      <div class="note">狀態：<span id="status">快取</span></div>
     </div>
 
-    <div id="list" class="grid"></div>
+    <div class="legend">
+      <span class="dot green"><i></i> ≥90 非常適合出遊</span>
+      <span class="dot blue"><i></i> 75–89 適合出遊</span>
+      <span class="dot amber"><i></i> 60–74 尚可出遊</span>
+      <span class="dot red"><i></i> &lt;60 建議改期</span>
+    </div>
+
+    <section class="grid" id="grid"></section>
   </main>
 
   <footer>
-    <div class="legend">
-      <span><i class="dot g"></i> ≥90 非常適合出遊</span>
-      <span><i class="dot b"></i> 75–89 適合出遊</span>
-      <span><i class="dot a"></i> 60–74 尚可出遊</span>
-      <span><i class="dot r"></i> &lt;60 建議改期</span>
+    <div class="small src">
+      © 2025 TripRadar（DEMO）．資料來源：
+      <a href="https://opendata.cwa.gov.tw/" target="_blank" rel="noopener">氣象署 CWB</a>、
+      <a href="https://data.moenv.gov.tw/" target="_blank" rel="noopener">環境部 OpenData</a>。
+      若網路不穩，系統會以快取示意呈現。
     </div>
-    <div style="margin-top:12px;">© 2025 TripRadar（DEMO）．本頁為 GitHub Pages 展示用</div>
   </footer>
 
-  <!-- 資料來源 Modal -->
-  <div id="dlgSource" class="modal-backdrop" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true">
-      <header>
-        <h3>資料來源</h3>
-        <button class="close" data-close="dlgSource">關閉 ×</button>
-      </header>
-      <div class="content">
-        <ul>
-          <li>中央氣象署 CWA：F-C0032-001（天氣預報）</li>
-          <li>環境部空品 AQI：aqx_p_432</li>
-          <li>災害資訊：NCDR（示意）</li>
-        </ul>
-        <p class="muted" style="margin-top:12px">* 本 DEMO 僅示意演算法與介面：實際連線時會依 API 回傳值計算。</p>
-      </div>
-    </div>
-  </div>
-
   <script>
-    // ======== 資料與工具 ========
-    const $ = (q, el=document) => el.querySelector(q);
-    const $$ = (q, el=document) => Array.from(el.querySelectorAll(q));
+  /* ========== 可選：若要連 OpenData，把 API KEY 填在這裡 ========== */
+  const CWB_API_KEY = "";     // 例： "CWA-XXXX"
+  const MOENV_AQI_KEY = "";   // 若需要
+  /* =========================================================== */
 
-    // 13 風景區（簡化）
-    const SPOTS = [
-      {name:"阿里山", city:"嘉義縣", lat:23.5089, lng:120.8069},
-      {name:"太魯閣", city:"花蓮縣", lat:24.1648, lng:121.6216},
-      {name:"日月潭", city:"南投縣", lat:23.8659, lng:120.9160},
-      {name:"西拉雅", city:"臺南市", lat:23.1182, lng:120.4694},
-      {name:"馬祖", city:"連江縣", lat:26.1600, lng:119.9490},
-      {name:"澎湖", city:"澎湖縣", lat:23.5711, lng:119.5797},
-      {name:"東部海岸", city:"臺東縣", lat:22.8733, lng:121.1597},
-      {name:"花東縱谷", city:"花蓮縣", lat:23.9732, lng:121.6023},
-      {name:"金門", city:"金門縣", lat:24.4367, lng:118.3186},
-      {name:"茂林", city:"高雄市", lat:22.8882, lng:120.6859},
-      {name:"雲嘉南濱海", city:"雲林縣", lat:23.7123, lng:120.2054},
-      {name:"北海岸及觀音山", city:"新北市", lat:25.2831, lng:121.5637},
-      {name:"東北角暨宜蘭海岸", city:"宜蘭縣", lat:24.9933, lng:121.9175}
-    ];
+  // 是否嘗試連 OpenData
+  const USE_OPENAPI = /[?&]openapi=1/.test(location.search) && (CWB_API_KEY || MOENV_AQI_KEY);
 
-    // Demo：若無法跨域取 OpenData，給一組穩定參數
-    function mockNow(){
-      // 盡量接近常見值：T、POP、AQI、UV
-      return {T:24, POP:20, AQI:45, UV:6};
+  // 官方網站對照表（可自行更新）
+  const SPOT_URL = {
+    "阿里山":"https://www.alishan-nsa.gov.tw",
+    "太魯閣":"https://www.taroko.gov.tw",
+    "日月潭":"https://www.sunmoonlake.gov.tw",
+    "西拉雅":"https://www.siraya-nsa.gov.tw",
+    "馬祖":"https://www.matsu-nsa.gov.tw",
+    "澎湖":"https://www.penghu-nsa.gov.tw",
+    "東部海岸":"https://www.eastcoast-nsa.gov.tw",
+    "花東縱谷":"https://www.erv-nsa.gov.tw",
+    "金門":"https://www.kinmen-nsa.gov.tw",
+    "茂林":"https://www.maolin-nsa.gov.tw",
+    "雲嘉南濱海":"https://www.swcoast-nsa.gov.tw",
+    "北海岸及觀音山":"https://www.northguan-nsa.gov.tw",
+    "東北角暨宜蘭海岸":"https://www.necoast-nsa.gov.tw"
+  };
+
+  // 13 處風景區（示意座標 + 所屬縣市）
+  const SPOTS = [
+    {name:"阿里山", city:"嘉義縣", lat:23.5085, lng:120.795,  mock:{T:24, POP:20, UV:6, AQI:45}},
+    {name:"太魯閣", city:"花蓮縣", lat:24.163,  lng:121.621,  mock:{T:22, POP:30, UV:6, AQI:35}},
+    {name:"日月潭", city:"南投縣", lat:23.865,  lng:120.915,  mock:{T:24, POP:20, UV:6, AQI:45}},
+    {name:"西拉雅", city:"臺南市", lat:23.114,  lng:120.319,  mock:{T:26, POP:10, UV:7, AQI:55}},
+    {name:"馬祖",   city:"連江縣", lat:26.161,  lng:119.949,  mock:{T:22, POP:30, UV:6, AQI:40}},
+    {name:"澎湖",   city:"澎湖縣", lat:23.571,  lng:119.579,  mock:{T:25, POP:20, UV:7, AQI:50}},
+    {name:"東部海岸",city:"臺東縣", lat:22.947,  lng:121.163,  mock:{T:27, POP:10, UV:8, AQI:35}},
+    {name:"花東縱谷",city:"花蓮縣", lat:23.6,    lng:121.38,   mock:{T:26, POP:20, UV:7, AQI:40}},
+    {name:"金門",   city:"金門縣", lat:24.436,  lng:118.318,  mock:{T:23, POP:20, UV:6, AQI:45}},
+    {name:"茂林",   city:"高雄市", lat:22.89,   lng:120.68,   mock:{T:27, POP:20, UV:7, AQI:55}},
+    {name:"雲嘉南濱海", city:"雲林縣",lat:23.707, lng:120.180,  mock:{T:25, POP:20, UV:7, AQI:60}},
+    {name:"北海岸及觀音山",city:"新北市",lat:25.287,lng:121.568, mock:{T:23, POP:30, UV:6, AQI:40}},
+    {name:"東北角暨宜蘭海岸",city:"宜蘭縣",lat:24.971,lng:121.917, mock:{T:24, POP:20, UV:6, AQI:45}}
+  ];
+
+  // 旅遊分數（簡化版演算法：Base 75，依指標微調；之後可換成實際 OpenData）
+  function calcTripScore(m){
+    // m: {T, POP, UV, AQI}
+    let score = 75;
+    // 溫度：趨近 18~28 最佳；超出區間每 1°C -1 分
+    if(m.T!==undefined){
+      if(m.T<18) score -= (18-m.T);
+      if(m.T>28) score -= (m.T-28);
     }
+    // 降雨機率：每 +10% → -5 分
+    if(m.POP!==undefined) score -= Math.round((m.POP/10)*5*0.5); // 稍微放緩
+    // AQI：每 +10 → -2 分
+    if(m.AQI!==undefined) score -= Math.round((m.AQI/10)*2);
+    // UV：>8 稍降
+    if(m.UV!==undefined && m.UV>8) score -= (m.UV-8)*2;
 
-    // 計分：Base = (T×0.25 + R×0.35 + A×0.25 + U×0.15)
-    // 這裡把指標轉換到 0~100：越舒適分數越高（簡化映射）
-    function metricScore(now){
-      // 溫度 18–28 最舒適, 每偏 1°C -6 分
-      let t = 70 - Math.abs(now.T - 23) * 6; // 取 23 做中位
-      t = Math.max(0, Math.min(100, t));
+    // 限制在 0~100
+    score = Math.max(0, Math.min(100, score));
+    return Math.round(score);
+  }
 
-      // 降雨機率 100% -> 0 分，0% -> 100 分
-      let r = 100 - now.POP;
-      // AQI 每 +1 -> -0.8 分（0 最佳）
-      let a = Math.max(0, 100 - now.AQI*0.8);
-      // UV：預設 70 分，UV 高略降
-      let u = Math.max(0, 70 - (now.UV-6)*5);
+  // 顏色：🔵75–89 要藍色（修正）
+  function scoreClass(s){
+    if(s>=90) return "score-green";
+    if(s>=75) return "score-blue";
+    if(s>=60) return "score-amber";
+    return "score-red";
+  }
 
-      let base = (t*0.25 + r*0.35 + a*0.25 + u*0.15);
-      return Math.round(base);
-    }
+  // 動作：一鍵到點（僅開點位）
+  function openMapAt(lat,lng,name){
+    const ua = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(ua);
+    const url = isIOS
+      ? `http://maps.apple.com/?ll=${lat},${lng}&q=${encodeURIComponent(name||"目的地")}`
+      : `https://maps.google.com/?q=${encodeURIComponent(name||"目的地")}@${lat},${lng}`;
+    window.open(url,"_blank");
+  }
 
-    // 加權：同縣市 +5；遠距 >200km -5；離島差異 -10（示意）
-    function weighted(base, spot, userCity){
-      let w = 0;
-      if (spot.city === userCity) w += 5;
+  // 動作：地圖導航（直接路線）
+  function openNavTo(lat,lng){
+    const ua = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(ua);
+    const url = isIOS
+      ? `http://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`
+      : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+    window.open(url,"_blank");
+  }
 
-      // 粗略距離（不抓定位，用城市名近似）：離島就 -5
-      if (["金門縣","連江縣","澎湖縣"].includes(spot.city) && spot.city !== userCity) {
-        w -= 5;
-      }
-      // 遠距 -5（示意）
-      if (spot.city !== userCity) w -= 5;
-
-      return Math.max(0, Math.min(100, base + w));
-    }
-
-    function scoreColor(s){
-      if (s>=90) return "s-green";
-      if (s>=75) return "s-blue";
-      if (s>=60) return "s-amber";
-      return "s-red";
-    }
-
-    // 地圖：一鍵到點（開啟 Apple/Google Maps point）
-    function openMapAt(lat,lng,name){
-      const ios = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-      if (ios){
-        location.href = `http://maps.apple.com/?ll=${lat},${lng}&q=${encodeURIComponent(name)}`;
-      }else{
-        location.href = `https://maps.google.com/?q=${encodeURIComponent(name)}@${lat},${lng}`;
-      }
-    }
-
-    // 地圖：導航（from current → 目的地）
-    function navigateTo(lat,lng,name){
-      const ios = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-      if (ios){
-        location.href = `http://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`;
-      }else{
-        location.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
-      }
-    }
-
-    // 資料來源視窗
-    function openSource(){ $("#dlgSource").style.display="grid"; }
-    function closeDialog(id){ $("#"+id).style.display="none"; }
-    $$("#dlgSource [data-close]").forEach(btn=>btn.addEventListener("click", e=>{
-      closeDialog(e.currentTarget.dataset.close);
-    }));
-    $("#dlgSource").addEventListener("click", (e)=>{
-      if (e.target.id==="dlgSource") closeDialog("dlgSource");
-    });
-
-    // ======== 畫面渲染 ========
-    const $list = $("#list");
-    const $selCity = $("#selCity");
-    const $useGeo = $("#useGeo");
-    const $ts = $("#ts");
-    const $mode = $("#mode");
-    $("#btnReload").addEventListener("click", render);
-
-    function createCard(spot, now, base, final){
-      const c = document.createElement("div");
-      c.className = "card";
-      const color = scoreColor(final);
-      c.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-          <div>
-            <h3>${spot.name}</h3>
-            <div class="sub">${spot.city}</div>
-          </div>
-          <div class="score-badge ${color}">建議旅遊分數 ${final}</div>
-        </div>
-
-        <div class="chips">
-          <span class="chip">🌡️ ${now.T}°C</span>
-          <span class="chip">🌧️ ${now.POP}%</span>
-          <span class="chip">☀️ UV ${now.UV}</span>
-          <span class="chip">🫧 AQI ${now.AQI}</span>
-        </div>
-
-        <div class="actions">
-          <button class="btn" data-act="go"   data-lat="${spot.lat}" data-lng="${spot.lng}" data-name="${spot.name}"><span class="emo">📍</span>一鍵到點</button>
-          <button class="btn" data-act="nav"  data-lat="${spot.lat}" data-lng="${spot.lng}" data-name="${spot.name}"><span class="emo">🗺️</span>地圖導航</button>
-          <button class="btn" data-act="src"><span class="emo">📄</span>資料來源</button>
-        </div>
-      `;
-      c.querySelectorAll(".btn").forEach(b=>{
-        b.addEventListener("click",()=>{
-          const act = b.dataset.act;
-          if (act==="go")  openMapAt(b.dataset.lat, b.dataset.lng, b.dataset.name);
-          if (act==="nav") navigateTo(b.dataset.lat, b.dataset.lng, b.dataset.name);
-          if (act==="src") openSource();
-        });
+  // 產生卡片
+  function createCard(spot){
+    const s = spot.score;
+    const cls = scoreClass(s);
+    const el = document.createElement("article");
+    el.className = "card";
+    el.innerHTML = `
+      <h3>${spot.name}</h3>
+      <span class="badge ${cls}">建議旅遊分數 ${s}</span>
+      <div class="chips">
+        <span class="chip">🌡️ T ${spot.T}°C</span>
+        <span class="chip">🌧️ POP ${spot.POP}%</span>
+        <span class="chip">☀️ UV ${spot.UV}</span>
+        <span class="chip">🫧 AQI ${spot.AQI}</span>
+        <span class="chip">📍 ${spot.city}</span>
+      </div>
+      <div class="actions">
+        <button class="btn" data-act="go" data-lat="${spot.lat}" data-lng="${spot.lng}" data-name="${spot.name}">
+          <span class="emo">📍</span>一鍵到點
+        </button>
+        <button class="btn" data-act="nav" data-lat="${spot.lat}" data-lng="${spot.lng}" data-name="${spot.name}">
+          <span class="emo">🗺️</span>地圖導航
+        </button>
+        <button class="btn" data-act="web" data-name="${spot.name}">
+          <span class="emo">🌐</span>官方網站
+        </button>
+      </div>
+    `;
+    // 事件
+    el.querySelectorAll(".actions .btn").forEach(b=>{
+      b.addEventListener("click",()=>{
+        const act = b.dataset.act;
+        if(act==="go")  openMapAt(+b.dataset.lat,+b.dataset.lng,b.dataset.name);
+        if(act==="nav") openNavTo(+b.dataset.lat,+b.dataset.lng);
+        if(act==="web"){
+          const url = SPOT_URL[b.dataset.name];
+          if(url) window.open(url,"_blank");
+          else alert("尚未設定官方網站。");
+        }
       });
-      return c;
+    });
+    return el;
+  }
+
+  // 主流程：抓資料（此版預設使用 Mock；加 ?openapi=1 並填 KEY 後可擴充）
+  async function loadData(){
+    const status = document.getElementById("status");
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    // 1) 取得所在地（影響加權）
+    let locCity = document.getElementById("city").value;
+    const useGeo = document.getElementById("useGeo").checked;
+
+    if(useGeo && navigator.geolocation){
+      try{
+        const pos = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:4000}));
+        // 這裡僅做示意：實務上可把經緯度反查縣市
+        // 先以「最近」來判斷是否同縣市加權
+        const my = {lat:pos.coords.latitude, lng:pos.coords.longitude};
+        // 粗略：距離最近的 spot 所在縣市
+        let minD = Infinity, nearCity = locCity;
+        for(const sp of SPOTS){
+          const d = Math.hypot(sp.lat-my.lat, sp.lng-my.lng);
+          if(d<minD){minD=d;nearCity=sp.city;}
+        }
+        locCity = nearCity;
+      }catch(e){/* ignore */ }
     }
 
-    async function render(){
-      // 時戳
-      const nowTs = new Date();
-      $ts.textContent = nowTs.toISOString().slice(0,16).replace("T"," ");
-      $mode.textContent = "快取";
+    // 2) 來源資料
+    const useApi = USE_OPENAPI;
+    status.textContent = useApi ? "連線" : "快取";
 
-      const userCity = $selCity.value;
-      $list.innerHTML = "";
+    // 3) 組成清單
+    const list = [];
+    for(const sp of SPOTS){
+      // 模擬或真實值（此版以 mock 為主）
+      const m = {...sp.mock}; // 若接 API，在這裡覆蓋 m.T/m.POP/m.UV/m.AQI
 
-      for (const spot of SPOTS){
-        // 簡化：要接 API 的話，把 mockNow() 換成真實 fetch 結果
-        const now = mockNow();
-        const base = metricScore(now);
-        const final = $useGeo.checked ? weighted(base, spot, userCity) : base;
-        $list.appendChild(createCard(spot, now, base, final));
-      }
+      // Base 分數
+      let score = calcTripScore(m);
+      // 所在地加權：同縣市 +5；不同縣市 0；離島差異 -5（示意）
+      const same = (sp.city.includes(locCity) || locCity.includes(sp.city));
+      const isIsland = /澎湖|金門|馬祖/.test(sp.city) && !/澎湖|金門|馬祖/.test(locCity);
+      if(same) score += 5;
+      if(isIsland) score -= 5;
+      score = Math.max(0,Math.min(100,score));
+
+      list.push({
+        ...sp,
+        T:m.T, POP:m.POP, UV:m.UV, AQI:m.AQI,
+        score
+      });
     }
 
-    render();
+    // 排序：高分在前
+    list.sort((a,b)=>b.score-a.score);
+
+    // 更新時間
+    const now = new Date();
+    document.getElementById("lastUpdate").textContent =
+      "更新時間：" + now.toLocaleString("zh-TW", {hour12:false});
+
+    // 塞卡片
+    const frag = document.createDocumentFragment();
+    list.forEach(sp=>frag.appendChild(createCard(sp)));
+    grid.appendChild(frag);
+  }
+
+  // init
+  document.getElementById("btnReload").addEventListener("click", loadData);
+  document.getElementById("city").addEventListener("change", loadData);
+  document.getElementById("useGeo").addEventListener("change", loadData);
+  loadData();
   </script>
 </body>
 </html>
