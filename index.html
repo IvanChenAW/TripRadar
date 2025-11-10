@@ -3,243 +3,309 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>TripRadar｜行前 1 分鐘 · 建議旅遊分數 + 交通與災害風險</title>
+<title>TripRadar｜真實 OpenData 版</title>
 <style>
   :root{
     --bg:#f5f7fb; --card:#fff; --text:#0f172a; --muted:#64748b; --brand:#2563eb;
     --green:#16a34a; --blue:#2563eb; --amber:#d97706; --red:#dc2626;
-    --chip:#eef2ff; --chipText:#1e293b; --pill:#eef2ff;
-    --shadow:0 10px 24px rgba(15,23,42,.08);
-    --radius:16px;
+    --chip:#eef2ff; --pill:#eef2ff; --shadow:0 10px 24px rgba(15,23,42,.08); --r:16px;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font-family: "Noto Sans TC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", Arial, sans-serif}
-  header{
-    background:linear-gradient(180deg,#3576ff 0%, #2c5df2 60%, #2248da 100%);
-    color:#fff;padding:28px 20px 24px;position:sticky;top:0;z-index:10;
-  }
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans TC",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"PingFang TC","Microsoft JhengHei",Arial,sans-serif}
+  header{background:linear-gradient(180deg,#3576ff 0%,#2c5df2 60%,#2248da 100%);color:#fff;padding:28px 20px 22px;position:sticky;top:0;z-index:10}
   .wrap{max-width:1200px;margin:0 auto}
-  h1{margin:0;font-size:28px;letter-spacing:1px}
+  h1{margin:0;font-size:28px}
   .sub{opacity:.92;margin-top:6px}
   .toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
-  .btn{background:#fff;color:#0f172a;border:none;border-radius:999px;padding:10px 16px;font-weight:700;box-shadow:var(--shadow);display:inline-flex;gap:10px;align-items:center}
-  .btn.primary{background:#0ea5e9;color:#fff}
+  .btn{background:#fff;color:#0f172a;border:none;border-radius:999px;padding:10px 16px;font-weight:700;box-shadow:var(--shadow)}
   .btn:active{transform:translateY(1px)}
-  .row{max-width:1200px;margin:18px auto 0;padding:0 16px;display:flex;gap:12px;flex-wrap:wrap}
-  .chip{background:var(--chip);color:var(--chipText);padding:8px 12px;border-radius:999px;font-weight:700}
-  .ctl{background:var(--card);box-shadow:var(--shadow);border-radius:var(--radius);padding:14px 16px;display:flex;gap:12px;align-items:center}
-  .ctl select,.ctl input[type="checkbox"]{font-size:16px}
-  .grid{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+  .row{max-width:1200px;margin:16px auto 0;padding:0 16px;display:flex;gap:12px;flex-wrap:wrap}
+  .ctl{background:var(--card);box-shadow:var(--shadow);border-radius:var(--r);padding:12px 14px;display:flex;gap:10px;align-items:center}
+  .chip{background:#eaf1ff;color:#1e293b;padding:7px 12px;border-radius:999px;font-weight:700}
+  .legend{max-width:1200px;margin:8px auto 0;padding:0 16px;display:flex;gap:10px;flex-wrap:wrap;color:#1f2937}
+  .legend .item{display:flex;align-items:center;gap:8px;background:#fff;border-radius:999px;padding:8px 12px;box-shadow:var(--shadow);font-weight:700}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .g{background:#16a34a}.b{background:#2563eb}.a{background:#d97706}.r{background:#dc2626}
+  .grid{max-width:1200px;margin:12px auto;padding:0 16px;display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
   @media (max-width:1024px){.grid{grid-template-columns:repeat(8,1fr)}}
   @media (max-width:640px){.grid{grid-template-columns:repeat(4,1fr)}}
-  .card{grid-column:span 6;background:var(--card);box-shadow:var(--shadow);border-radius:var(--radius);padding:18px}
+  .card{grid-column:span 6;background:#fff;box-shadow:var(--shadow);border-radius:var(--r);padding:18px}
   @media (max-width:640px){.card{grid-column:span 4}}
-  .title{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .title{display:flex;justify-content:space-between;align-items:start;gap:10px}
   .title h3{margin:0;font-size:22px}
-  .badge{background:#f1f5ff;border-radius:999px;padding:8px 12px;font-weight:800}
-  .badge.green{background:#ecfdf5;color:var(--green)}
-  .badge.blue{background:#eff6ff;color:var(--blue)}
-  .badge.amber{background:#fff7ed;color:var(--amber)}
-  .badge.red{background:#fef2f2;color:var(--red)}
-  .meta{color:var(--muted);margin:6px 0 10px}
-  .metrics{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 12px}
-  .pill{background:var(--pill);padding:8px 12px;border-radius:12px;font-weight:700}
-  .acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
-  .actBtn{flex:0 0 auto;border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;cursor:pointer}
-  .src{max-width:1200px;margin:10px auto 26px;padding:0 16px;color:var(--muted)}
-  footer{color:#94a3b8;text-align:center;margin:36px 0 16px}
-  .muted{color:var(--muted)}
+  .badge{border-radius:12px;padding:8px 12px;font-weight:800}
+  .badge.green{background:#ecfdf5;color:#16a34a}
+  .badge.blue{background:#eff6ff;color:#2563eb}
+  .badge.amber{background:#fff7ed;color:#d97706}
+  .badge.red{background:#fef2f2;color:#dc2626}
+  .meta{color:#64748b;margin:6px 0 10px}
+  .metrics{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 8px}
+  .pill{background:#eef2ff;padding:8px 12px;border-radius:12px;font-weight:700}
+  .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .actBtn{border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;cursor:pointer}
+  .src{max-width:1200px;margin:10px auto 26px;padding:0 16px;color:#64748b}
+  footer{color:#94a3b8;text-align:center;margin:30px 0 16px}
 </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <h1>TripRadar</h1>
-      <div class="sub">行前 1 分鐘｜建議旅遊分數 + 一句建議</div>
-      <div class="toolbar">
-        <button id="btnRefresh" class="btn">🔄 重新抓取</button>
-        <div id="txtTime" class="btn">🕒 更新時間：—</div>
-      </div>
+<header>
+  <div class="wrap">
+    <h1>TripRadar</h1>
+    <div class="sub">行前 1 分鐘 · 建議旅遊分數 + 一句建議（真實 API 版；失敗自動回退 Demo）</div>
+    <div class="toolbar">
+      <button id="btnRefresh" class="btn">🔄 重新抓取</button>
+      <div id="txtTime" class="btn">🕒 更新時間：—</div>
     </div>
-  </header>
+  </div>
+</header>
 
-  <section class="row">
-    <div class="ctl">
-      <input id="useGeo" type="checkbox" checked />
-      <label for="useGeo"><b>使用所在地加權</b></label>
-    </div>
-    <div class="ctl">
-      <span class="muted">手動所在地：</span>
-      <select id="selCity">
-        <option>臺北市</option><option>新北市</option><option>桃園市</option>
-        <option>新竹市</option><option>新竹縣</option><option>苗栗縣</option>
-        <option>臺中市</option><option>彰化縣</option><option>南投縣</option>
-        <option>雲林縣</option><option>嘉義縣</option><option>嘉義市</option>
-        <option>臺南市</option><option>高雄市</option><option>屏東縣</option>
-        <option>宜蘭縣</option><option>花蓮縣</option><option>臺東縣</option>
-      </select>
-    </div>
-  </section>
+<section class="row">
+  <div class="ctl">
+    <input id="useGeo" type="checkbox" checked />
+    <label for="useGeo"><b>使用所在地加權</b></label>
+  </div>
+  <div class="ctl">
+    <span>手動所在地：</span>
+    <select id="selCity"></select>
+  </div>
+  <div class="ctl chip" id="badgeCWB">CWB：天氣（連線中…）</div>
+  <div class="ctl chip" id="badgeAQI">MoENV：AQI（連線中…）</div>
+  <div class="ctl chip">NCDR / TDX：展示先回退（可改 proxy 啟用）</div>
+</section>
 
-  <section class="row">
-    <div class="chip">CWB：天氣（展示用假資料）</div>
-    <div class="chip">MoENV：AQI（展示用假資料）</div>
-    <div class="chip">NCDR：災害 CAP（展示用假資料）</div>
-    <div class="chip">TDX：轉乘 / 路況（展示用假資料）</div>
-  </section>
+<section class="legend">
+  <div class="item"><span class="dot g"></span> ≥90 非常適合出遊</div>
+  <div class="item"><span class="dot b"></span> 75–89 適合出遊</div>
+  <div class="item"><span class="dot a"></span> 60–74 尚可出遊</div>
+  <div class="item"><span class="dot r"></span> &lt;60 建議改期</div>
+</section>
 
-  <section id="cards" class="grid"></section>
-
-  <div class="src wrap">資料來源：CWB F-C0032-001、MoENV aqi_p_432、NCDR CAP、TDX（此頁為展示版，實際競賽可切換成真 API）</div>
-  <footer>© 2025 TripRadar（DEMO）</footer>
+<section id="cards" class="grid"></section>
+<div class="src wrap">資料源：CWB F-C0032-001（縣市預報）、MoENV AQI（aqx_p_432）。此頁面採「前端直連」；若 CORS 或授權受限，系統會回退展示值以確保 Demo 順暢。</div>
+<footer>© 2025 TripRadar（DEMO＋Live 混合）</footer>
 
 <script>
-/* =========================
-   0) 展示模式（不連外）
-   ========================= */
-const DEMO_MODE = true;
+/* ========= 可選：在這裡填入你的金鑰 / proxy ========= */
+// ←（建議先空白讓它回退 Demo；要直播再填）
+// CWB：到 https://opendata.cwa.gov.tw/ 申請
+const CWB_TOKEN = "";   // 例：'CWA-XXXX'
+// MoENV：到 https://data.moenv.gov.tw/ 申請（或留空改用開放匿名）
+const MOENV_API_KEY = ""; // 例：'YOUR-KEY'
+// 若你有自己的 proxy，可把 URL 寫在這（例如 Cloudflare Workers）：
+const NCDR_PROXY = "";   // 例：'https://yourproxy.example.com/ncdr?url='
+const TDX_PROXY  = "";   // 例：'https://yourproxy.example.com/tdx?path='
 
-/* =========================
-   1) 基本資料：13 處國家風景區
-   ========================= */
+/* ========= 回退 Demo 的保底開關 ========= */
+const DEMO_MODE_FALLBACK = true;
+
+/* ========= 縣市清單 ========= */
+const CITIES = ["臺北市","新北市","基隆市","桃園市","新竹市","新竹縣","苗栗縣","臺中市","彰化縣","南投縣","雲林縣","嘉義縣","嘉義市","臺南市","高雄市","屏東縣","宜蘭縣","花蓮縣","臺東縣","澎湖縣","金門縣","連江縣"];
+const selCity = document.getElementById('selCity');
+selCity.innerHTML = CITIES.map(c=>`<option>${c}</option>`).join('');
+selCity.value="新竹市";
+
+/* ========= 13 處風景區 ========= */
 const spots = [
-  { name: "阿里山",  region: "嘉義縣", lat: 23.508, lng: 120.81,  url: "https://www.ali-nsa.net/" },
-  { name: "太魯閣",  region: "花蓮縣", lat: 24.18,  lng: 121.49,  url: "https://www.taroko.gov.tw/" },
-  { name: "日月潭",  region: "南投縣", lat: 23.86,  lng: 120.91,  url: "https://www.sunmoonlake.gov.tw/" },
-  { name: "西拉雅",  region: "臺南市", lat: 23.18,  lng: 120.40,  url: "https://www.siraya-nsa.gov.tw/" },
-  { name: "花東縱谷",region: "花蓮縣", lat: 23.90,  lng: 121.54,  url: "https://www.erv-nsa.gov.tw/" },
-  { name: "東部海岸",region: "臺東縣", lat: 22.90,  lng: 121.16,  url: "https://www.eastcoast-nsa.gov.tw/" },
-  { name: "北海岸及觀音山",region:"新北市", lat: 25.28, lng: 121.56, url:"https://www.northguan-nsa.gov.tw/" },
-  { name: "茂林",    region: "高雄市", lat: 22.88,  lng: 120.68,  url: "https://www.maolin-nsa.gov.tw/" },
-  { name: "澎湖",    region: "澎湖縣", lat: 23.57,  lng: 119.56,  url: "https://www.penghu-nsa.gov.tw/" },
-  { name: "馬祖",    region: "連江縣", lat: 26.16,  lng: 119.93,  url: "https://www.matsu-nsa.gov.tw/" },
-  { name: "雲嘉南濱海",region:"雲林縣", lat: 23.37, lng: 120.15, url:"https://www.swcoast-nsa.gov.tw/" },
-  { name: "金門",    region: "金門縣", lat: 24.45,  lng: 118.39,  url: "https://www.kinmen-nsa.gov.tw/" },
-  { name: "東北角暨宜蘭海岸",region:"宜蘭縣", lat: 24.98, lng: 121.91, url:"https://www.necoast-nsa.gov.tw/" }
+  { name:"阿里山", region:"嘉義縣", lat:23.508, lng:120.81, url:"https://www.ali-nsa.net/"},
+  { name:"太魯閣", region:"花蓮縣", lat:24.18, lng:121.49, url:"https://www.taroko.gov.tw/"},
+  { name:"日月潭", region:"南投縣", lat:23.86, lng:120.91, url:"https://www.sunmoonlake.gov.tw/"},
+  { name:"西拉雅", region:"臺南市", lat:23.18, lng:120.40, url:"https://www.siraya-nsa.gov.tw/"},
+  { name:"花東縑谷", region:"花蓮縣", lat:23.90, lng:121.54, url:"https://www.erv-nsa.gov.tw/"},
+  { name:"東部海岸", region:"臺東縣", lat:22.90, lng:121.16, url:"https://www.eastcoast-nsa.gov.tw/"},
+  { name:"北海岸及觀音山", region:"新北市", lat:25.28, lng:121.56, url:"https://www.northguan-nsa.gov.tw/"},
+  { name:"茂林", region:"高雄市", lat:22.88, lng:120.68, url:"https://www.maolin-nsa.gov.tw/"},
+  { name:"澎湖", region:"澎湖縣", lat:23.57, lng:119.56, url:"https://www.penghu-nsa.gov.tw/"},
+  { name:"馬祖", region:"連江縣", lat:26.16, lng:119.93, url:"https://www.matsu-nsa.gov.tw/"},
+  { name:"雲嘉南濱海", region:"雲林縣", lat:23.37, lng:120.15, url:"https://www.swcoast-nsa.gov.tw/"},
+  { name:"金門", region:"金門縣", lat:24.45, lng:118.39, url:"https://www.kinmen-nsa.gov.tw/"},
+  { name:"東北角暨宜蘭海岸", region:"宜蘭縣", lat:24.98, lng:121.91, url:"https://www.necoast-nsa.gov.tw/"}
 ];
 
-/* =========================
-   2) 展示用模擬資料（天氣 / AQI / 災害 / 路況）
-   ========================= */
-const weatherData = { // 每縣市：溫度、降雨機率、UV、AQI
-  "嘉義縣":{temp:24,pop:20,uv:6,aqi:45}, "花蓮縣":{temp:25,pop:30,uv:7,aqi:50},
-  "南投縣":{temp:23,pop:25,uv:7,aqi:40}, "臺南市":{temp:26,pop:10,uv:8,aqi:55},
-  "臺東縣":{temp:26,pop:15,uv:8,aqi:35}, "新北市":{temp:24,pop:20,uv:6,aqi:48},
-  "高雄市":{temp:27,pop:20,uv:9,aqi:60}, "澎湖縣":{temp:25,pop:10,uv:8,aqi:38},
-  "連江縣":{temp:20,pop:15,uv:5,aqi:30}, "雲林縣":{temp:25,pop:20,uv:7,aqi:50},
-  "金門縣":{temp:22,pop:10,uv:6,aqi:32}, "宜蘭縣":{temp:23,pop:35,uv:6,aqi:42}
+/* ========= Demo 值（保底） ========= */
+const demoWeather = {
+  "嘉義縣":{temp:24,pop:20,uv:6,aqi:45},"花蓮縣":{temp:25,pop:30,uv:7,aqi:50},
+  "南投縣":{temp:23,pop:25,uv:7,aqi:40},"臺南市":{temp:26,pop:10,uv:8,aqi:55},
+  "臺東縣":{temp:26,pop:15,uv:8,aqi:35},"新北市":{temp:24,pop:20,uv:6,aqi:48},
+  "高雄市":{temp:27,pop:20,uv:9,aqi:60},"澎湖縣":{temp:25,pop:10,uv:8,aqi:38},
+  "連江縣":{temp:20,pop:15,uv:5,aqi:30},"雲林縣":{temp:25,pop:20,uv:7,aqi:50},
+  "金門縣":{temp:22,pop:10,uv:6,aqi:32},"宜蘭縣":{temp:23,pop:35,uv:6,aqi:42}
 };
+const demoDisaster = {"嘉義縣":0,"花蓮縣":0,"南投縣":0,"臺南市":0,"臺東縣":0,"新北市":0,"高雄市":0,"澎湖縣":0,"連江縣":0,"雲林縣":1,"金門縣":0,"宜蘭縣":0};
+const demoTraffic  = {"嘉義縣":1,"花蓮縣":0,"南投縣":0,"臺南市":0,"臺東縣":0,"新北市":1,"高雄市":1,"澎湖縣":0,"連江縣":0,"雲林縣":1,"金門縣":0,"宜蘭縣":1};
 
-const disasterData = { // 0=無、1=注意、2=警報（簡化）
-  "嘉義縣":0,"花蓮縣":0,"南投縣":0,"臺南市":0,"臺東縣":0,"新北市":0,
-  "高雄市":0,"澎湖縣":0,"連江縣":0,"雲林縣":1,"金門縣":0,"宜蘭縣":0
-};
-
-const trafficData = { // 0=順、1=車多、2=壅塞（簡化）
-  "嘉義縣":1,"花蓮縣":0,"南投縣":0,"臺南市":0,"臺東縣":0,"新北市":1,
-  "高雄市":1,"澎湖縣":0,"連江縣":0,"雲林縣":1,"金門縣":0,"宜蘭縣":1
-};
-
-/* =========================
-   3) 打分邏輯
-   ========================= */
-function baseScore({temp,pop,uv,aqi}){
-  let s = 75; // 以 75 為基準
-  // 溫度：離 23°C 每 ±1°C 扣 1 分，最多扣 10
-  s -= Math.min(10, Math.abs(temp-23)*1);
-  // 降雨：100% 扣 20 → 線性
-  s -= (pop/100)*20;
-  // AQI：每 +1 扣 0.8（AQI 50 約扣 40）
-  s -= (aqi)*0.8/2; // 降低一半影響（/2）以較符合旅遊感受
-  // UV：高 UV 不直接判定危險，給輕微 -3..0
-  if(uv>=9)s-=3; else if(uv>=7)s-=2; else if(uv>=6)s-=1;
-  return Math.max(0, Math.min(95, Math.round(s)));
+/* ========= 真實抓取：CWB（F-C0032-001） =========
+   取得：MinT, MaxT, PoP12h；UV CWB 沒有縣市即時值 → 以 6 當保底
+================================================ */
+async function fetchCWBByCounty(county){
+  if(!CWB_TOKEN) throw new Error('No CWB token');
+  const url = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=${CWB_TOKEN}&locationName=${encodeURIComponent(county)}`;
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('CWB HTTP '+r.status);
+  const j = await r.json();
+  const loc = j.records?.location?.[0];
+  if(!loc) throw new Error('CWB empty');
+  const el = Object.fromEntries(loc.weatherElement.map(e=>[e.elementName,e.time?.[0]?.parameter]));
+  const minT = Number(el.MinT?.parameterName ?? 23);
+  const maxT = Number(el.MaxT?.parameterName ?? 25);
+  const pop  = Number(el.PoP?.parameterName ?? 20);
+  const temp = Math.round((minT+maxT)/2);
+  const uv = 6; // 先保底（若你想串 UV API，可再補 O-A0005-001 站點近似）
+  return {temp,pop,uv};
 }
 
-function locationAdjust(spotRegion, userCity){
+/* ========= 真實抓取：MoENV AQI（aqx_p_432） =========
+   聚合縣市平均 AQI
+==================================================== */
+async function fetchAQIByCounty(){
+  // 有 API key 就帶上，沒有也嘗試匿名（官方偶爾允許）
+  const base = 'https://data.moenv.gov.tw/api/v2/aqx_p_432';
+  const q = `?format=json&limit=1000${MOENV_API_KEY ? '&api_key='+MOENV_API_KEY : ''}`;
+  const r = await fetch(base+q);
+  if(!r.ok) throw new Error('AQI HTTP '+r.status);
+  const j = await r.json();
+  const map = {};
+  j.records.forEach(rec=>{
+    const county = rec.county;
+    const aqi = Number(rec.aqi);
+    if(!county || !aqi) return;
+    if(!map[county]) map[county]=[];
+    map[county].push(aqi);
+  });
+  const avg = {};
+  Object.keys(map).forEach(k=>{
+    const arr = map[k];
+    avg[k] = Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
+  });
+  return avg; // {縣市: 平均AQI}
+}
+
+/* ========= 風險 / 交通（預留；無 proxy 先回退） ========= */
+async function fetchDisaster(){ return demoDisaster; }
+async function fetchTraffic(){ return demoTraffic; }
+
+/* ========= 打分與建議 ========= */
+function baseScore({temp,pop,uv,aqi}){
+  let s=75;
+  s -= Math.min(10, Math.abs(temp-23));      // 溫度落差
+  s -= (pop/100)*20;                         // 降雨
+  s -= (aqi||50)*0.4;                        // AQI（調和）
+  if(uv>=9) s-=3; else if(uv>=7) s-=2; else if(uv>=6) s-=1;
+  return Math.max(0,Math.min(95,Math.round(s)));
+}
+function locationAdjust(spotRegion,userCity){
   if(!document.getElementById('useGeo').checked) return 0;
-  if(!userCity) return 0;
-  // 同縣市 +5，近區 +2（簡化以字面判斷）
   if(spotRegion.includes(userCity) || userCity.includes(spotRegion)) return +5;
+  // 鄰近區簡化
   const near = [
-    ["臺北市","新北市","基隆市","宜蘭縣"],
-    ["新北市","臺北市","基隆市","宜蘭縣","桃園市"],
-    ["臺中市","南投縣","彰化縣","苗栗縣"],
-    ["臺南市","高雄市","嘉義縣","雲林縣","屏東縣"]
+    ["臺北市","新北市","基隆市","宜蘭縣"],["桃園市","新竹縣","新竹市"],
+    ["臺中市","苗栗縣","南投縣","彰化縣"],["臺南市","高雄市","雲林縣","嘉義縣"],
   ];
-  const line = near.find(g => g.includes(userCity));
-  if(line && line.some(x => spotRegion.includes(x))) return +2;
+  const g = near.find(a=>a.includes(userCity));
+  if(g && g.some(x=>spotRegion.includes(x))) return +2;
   return 0;
 }
-
-function riskPenalty(spotRegion){
-  // 災害：注意 -5；警報 -15
-  const d = disasterData[spotRegion] ?? 0;
-  const pDis = d===2 ? -15 : d===1 ? -5 : 0;
-  // 路況：壅塞 -8；車多 -3
-  const t = trafficData[spotRegion] ?? 0;
-  const pTra = t===2 ? -8 : t===1 ? -3 : 0;
-  return pDis + pTra;
+function riskPenalty(spotRegion,disaster,traffic){
+  const d = disaster[spotRegion] ?? 0;
+  const t = traffic[spotRegion] ?? 0;
+  const pd = d===2?-15: d===1?-5: 0;
+  const pt = t===2?-8:  t===1?-3: 0;
+  return pd+pt;
 }
-
-function finalScore(spotRegion, userCity, metrics){
-  const s0 = baseScore(metrics);
-  const adj = locationAdjust(spotRegion, userCity);
-  const pen = riskPenalty(spotRegion);
-  return Math.max(0, Math.min(100, s0 + adj + pen));
-}
-
 function colorOf(score){
-  if(score>=90) return {cls:"green", text:"非常適合出遊", emoji:"🟢"};
-  if(score>=75) return {cls:"blue",  text:"適合出遊",     emoji:"🔵"};
-  if(score>=60) return {cls:"amber", text:"尚可出遊",     emoji:"🟡"};
-  return {cls:"red",   text:"建議改期",     emoji:"🔴"};
+  if(score>=90) return {cls:"green",text:"非常適合出遊",emoji:"🟢"};
+  if(score>=75) return {cls:"blue", text:"適合出遊",  emoji:"🔵"};
+  if(score>=60) return {cls:"amber",text:"尚可出遊",  emoji:"🟡"};
+  return {cls:"red", text:"建議改期",  emoji:"🔴"};
+}
+function oneLineAdvice({temp,pop,uv,aqi},score){
+  if(score<60) return "天氣/能見度或降雨風險偏高，建議改期。";
+  if(pop>=50)  return "降雨機率偏高，記得雨具並留意路況。";
+  if(aqi>=80)  return "空品較差，建議口罩；改室內或低強度行程。";
+  if(uv>=8)    return "紫外線很強，防曬補水與遮陽不可少。";
+  if(Math.abs(temp-23)>=6) return "溫差較大，請備妥保暖/降溫用品。";
+  return "條件不錯，建議把握時間、避開尖峰車潮。";
 }
 
-/* =========================
-   4) 互動：地圖／導航／官網
-   ========================= */
+/* ========= UI 行為 ========= */
 function openMapAt(lat,lng){
   const ua=navigator.userAgent.toLowerCase();
   const apple=`http://maps.apple.com/?ll=${lat},${lng}`;
   const google=`https://maps.google.com/?q=${lat},${lng}`;
-  if(/iphone|ipad|macintosh/.test(ua)) window.open(apple,'_blank');
-  else window.open(google,'_blank');
+  if(/iphone|ipad|macintosh/.test(ua)) window.open(apple,'_blank'); else window.open(google,'_blank');
 }
 function navTo(lat,lng){
   const ua=navigator.userAgent.toLowerCase();
   const apple=`http://maps.apple.com/?daddr=${lat},${lng}`;
   const google=`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-  if(/iphone|ipad|macintosh/.test(ua)) window.open(apple,'_blank');
-  else window.open(google,'_blank');
+  if(/iphone|ipad|macintosh/.test(ua)) window.open(apple,'_blank'); else window.open(google,'_blank');
 }
 
-/* =========================
-   5) 產生卡片
-   ========================= */
-function render(){
+/* ========= 主流程：抓取 → 合成 → 繪製 ========= */
+async function loadAndRender(){
+  const badgeCWB = document.getElementById('badgeCWB');
+  const badgeAQI = document.getElementById('badgeAQI');
+  const userCity = selCity.value;
+
+  // 1) AQI（一次抓所有縣市，避免多連線）
+  let aqiMap;
+  try{
+    aqiMap = await fetchAQIByCounty();
+    badgeAQI.textContent = "MoENV：AQI（連線成功）";
+  }catch(e){
+    aqiMap = {};
+    badgeAQI.textContent = "MoENV：AQI（回退展示值）";
+  }
+
+  // 2) 災害＆交通（無 proxy 先回退）
+  const disaster = await fetchDisaster();
+  const traffic  = await fetchTraffic();
+
   const container = document.getElementById('cards');
   container.innerHTML = '';
-  const userCity = document.getElementById('selCity').value;
 
-  spots.forEach(sp => {
-    const met = weatherData[sp.region] || {temp:24,pop:20,uv:6,aqi:45};
-    const score = finalScore(sp.region, userCity, met);
-    const color = colorOf(score);
+  // 3) 逐風景區產生卡片（每張卡片要溫度/降雨，所以才逐縣市打 CWB；若要減少請改成快取）
+  for(const sp of spots){
+    let met;
+    try{
+      if(CWB_TOKEN){
+        const cw = await fetchCWBByCounty(sp.region);
+        met = { ...cw, aqi: aqiMap[sp.region] ?? (demoWeather[sp.region]?.aqi ?? 50) };
+        badgeCWB.textContent = "CWB：天氣（連線成功）";
+      }else{
+        throw new Error('no token');
+      }
+    }catch(e){
+      met = demoWeather[sp.region] || {temp:24,pop:20,uv:6,aqi: aqiMap[sp.region]??50};
+      badgeCWB.textContent = "CWB：天氣（回退展示值）";
+    }
 
-    const card = document.createElement('div');
-    card.className = 'card';
+    // 4) 打分＋建議
+    const s0 = baseScore(met);
+    const adj = locationAdjust(sp.region, userCity);
+    const pen = riskPenalty(sp.region, disaster, traffic);
+    const score = Math.max(0,Math.min(100, s0+adj+pen));
+    const led = colorOf(score);
+    const tip = oneLineAdvice(met, score);
+
+    // 5) 卡片
+    const card=document.createElement('div');
+    card.className='card';
     card.innerHTML = `
       <div class="title">
-        <h3>${sp.name}</h3>
-        <div class="badge ${color.cls}">${color.emoji} 建議旅遊分數 ${score}</div>
+        <div>
+          <h3>${sp.name}</h3>
+          <div class="meta">${sp.region}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="badge ${led.cls}">${led.emoji} 分數 ${score}</div>
+          <div class="meta" style="max-width:260px">${tip}</div>
+        </div>
       </div>
-      <div class="meta">${sp.region}</div>
       <div class="metrics">
         <div class="pill">🌡️ ${met.temp}°C</div>
         <div class="pill">🌧️ ${met.pop}%</div>
         <div class="pill">☀️ UV ${met.uv}</div>
-        <div class="pill">🫧 AQI ${met.aqi}</div>
+        <div class="pill">🫧 AQI ${met.aqi ?? '—'}</div>
       </div>
       <div class="acts">
         <button class="actBtn" data-act="pin">📍 一鍵到點</button>
@@ -247,29 +313,23 @@ function render(){
         <a class="actBtn" href="${sp.url}" target="_blank" rel="noopener">📄 官方網站</a>
       </div>
     `;
-    // 綁定
-    card.querySelector('[data-act="pin"]').onclick = () => openMapAt(sp.lat, sp.lng);
-    card.querySelector('[data-act="nav"]').onclick = () => navTo(sp.lat, sp.lng);
-
+    card.querySelector('[data-act="pin"]').onclick = ()=>openMapAt(sp.lat,sp.lng);
+    card.querySelector('[data-act="nav"]').onclick = ()=>navTo(sp.lat,sp.lng);
     container.appendChild(card);
-  });
+  }
 
   // 更新時間
-  const t = new Date();
-  const pad = n => n.toString().padStart(2,'0');
+  const t=new Date(), pad=n=>n.toString().padStart(2,'0');
   document.getElementById('txtTime').textContent =
     `🕒 更新時間：${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())} ${pad(t.getHours())}:${pad(t.getMinutes())}`;
 }
 
-/* =========================
-   6) 事件
-   ========================= */
-document.getElementById('btnRefresh').addEventListener('click', render);
-document.getElementById('selCity').addEventListener('change', render);
-document.getElementById('useGeo').addEventListener('change', render);
+document.getElementById('btnRefresh').addEventListener('click', loadAndRender);
+document.getElementById('useGeo').addEventListener('change', loadAndRender);
+selCity.addEventListener('change', loadAndRender);
 
 // 首次載入
-render();
+loadAndRender();
 </script>
 </body>
 </html>
