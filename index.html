@@ -1,252 +1,275 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TripRadar｜建議旅遊分數（v5.5 展示版）</title>
-<meta name="theme-color" content="#246BFD"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TripRadar｜行前 1 分鐘 · 建議旅遊分數 + 交通與災害風險</title>
 <style>
-:root{
-  --ink:#0d1b2a; --muted:#5b6b7a; --bg:#f7f9fc;
-  --card:#ffffff; --primary:#246BFD; --ok:#16a34a; --warn:#f59e0b; --bad:#ef4444; --blue:#2563eb;
-  --shadow:0 8px 24px rgba(13,27,42,.08);
-  --radius:18px;
-}
-*{box-sizing:border-box}
-body{
-  margin:0; font-family:"Noto Sans TC","PingFang TC",system-ui,-apple-system;
-  color:var(--ink); background:var(--bg);
-}
-header{
-  background:linear-gradient(180deg,#2d6dfd,#5aa2ff);
-  color:#fff; padding:24px 20px 16px; position:sticky; top:0; z-index:20;
-  box-shadow:0 6px 16px rgba(0,0,0,.08);
-}
-.brand{font-size:28px;font-weight:800;}
-.sub{opacity:.95;margin-top:4px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.pill{
-  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;
-  padding:10px 14px;border-radius:12px;backdrop-filter:blur(6px);font-weight:600;
-}
-.btn{
-  background:#fff;color:var(--primary);border:0;padding:10px 14px;border-radius:12px;font-weight:700;
-  box-shadow:var(--shadow);cursor:pointer;
-}
-main{padding:18px}
-.filterbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-.chk{display:flex;align-items:center;gap:10px;background:var(--card);padding:12px 14px;border-radius:12px;box-shadow:var(--shadow)}
-select{border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;background:#fff;box-shadow:var(--shadow);font-weight:700}
-.riskbar{display:none;align-items:center;gap:12px;background:#fff4e5;color:#8a3b00;border:1px solid #ffd9a8;
-padding:10px 12px;border-radius:12px;margin-bottom:14px;box-shadow:var(--shadow);}
-.grid{display:grid;grid-template-columns:1fr;gap:16px}
-@media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
-@media(min-width:1080px){.grid{grid-template-columns:1fr 1fr 1fr}}
-.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;}
-.card-hd{padding:18px 18px 0}
-.place{font-size:22px;font-weight:900}
-.county{color:var(--muted);margin-top:6px}
-.score-badge{margin-top:10px;display:inline-flex;align-items:center;gap:8px;font-weight:900;color:#fff;
-padding:8px 14px;border-radius:999px;}
-.s-green{background:linear-gradient(135deg,#22c55e,#10b981)}
-.s-blue{background:linear-gradient(135deg,#60a5fa,#2563eb)}
-.s-amber{background:linear-gradient(135deg,#fbbf24,#f59e0b)}
-.s-red{background:linear-gradient(135deg,#f87171,#ef4444)}
-.risk-chip{margin-left:8px;display:inline-flex;align-items:center;gap:6px;background:#fff0ef;color:#b42318;border:1px solid #ffc7c2;padding:6px 10px;border-radius:999px;font-weight:700}
-.indics{display:flex;gap:10px;padding:14px 18px 6px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:#eef2ff;color:#1f2a44;font-weight:800;border:1px solid #e6e9ff;}
-.ops{display:flex;gap:10px;padding:12px 18px 18px;flex-wrap:wrap}
-.action{flex:1 1 140px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;
-border:1px solid #e5e7eb;background:#fff;font-weight:800;cursor:pointer;}
-.src{padding:10px 18px 18px;color:var(--muted)}
-.src .btns{display:flex;gap:10px;flex-wrap:wrap}
-.tag{background:#eef2ff;border:1px solid #dbe1ff;color:#223;padding:8px 10px;border-radius:10px;font-weight:700}
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-end;z-index:40}
-.sheet{background:#fff;width:100%;border-radius:16px 16px 0 0;padding:16px;max-height:80vh;overflow:auto}
-.sheet h3{margin:4px 0 10px}
-.step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed #eee}
-.step:last-child{border-bottom:0}
-.step .k{font-weight:900;color:var(--primary);width:22px}
-.close{position:absolute;right:16px;top:10px;background:#eee;border:0;padding:6px 10px;border-radius:8px;cursor:pointer}
-.muted{color:var(--muted)}
+  :root{
+    --bg:#f5f7fb; --card:#fff; --text:#0f172a; --muted:#64748b; --brand:#2563eb;
+    --green:#16a34a; --blue:#2563eb; --amber:#d97706; --red:#dc2626;
+    --chip:#eef2ff; --chipText:#1e293b; --pill:#eef2ff;
+    --shadow:0 10px 24px rgba(15,23,42,.08);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family: "Noto Sans TC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", Arial, sans-serif}
+  header{
+    background:linear-gradient(180deg,#3576ff 0%, #2c5df2 60%, #2248da 100%);
+    color:#fff;padding:28px 20px 24px;position:sticky;top:0;z-index:10;
+  }
+  .wrap{max-width:1200px;margin:0 auto}
+  h1{margin:0;font-size:28px;letter-spacing:1px}
+  .sub{opacity:.92;margin-top:6px}
+  .toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+  .btn{background:#fff;color:#0f172a;border:none;border-radius:999px;padding:10px 16px;font-weight:700;box-shadow:var(--shadow);display:inline-flex;gap:10px;align-items:center}
+  .btn.primary{background:#0ea5e9;color:#fff}
+  .btn:active{transform:translateY(1px)}
+  .row{max-width:1200px;margin:18px auto 0;padding:0 16px;display:flex;gap:12px;flex-wrap:wrap}
+  .chip{background:var(--chip);color:var(--chipText);padding:8px 12px;border-radius:999px;font-weight:700}
+  .ctl{background:var(--card);box-shadow:var(--shadow);border-radius:var(--radius);padding:14px 16px;display:flex;gap:12px;align-items:center}
+  .ctl select,.ctl input[type="checkbox"]{font-size:16px}
+  .grid{max-width:1200px;margin:16px auto;padding:0 16px;display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+  @media (max-width:1024px){.grid{grid-template-columns:repeat(8,1fr)}}
+  @media (max-width:640px){.grid{grid-template-columns:repeat(4,1fr)}}
+  .card{grid-column:span 6;background:var(--card);box-shadow:var(--shadow);border-radius:var(--radius);padding:18px}
+  @media (max-width:640px){.card{grid-column:span 4}}
+  .title{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .title h3{margin:0;font-size:22px}
+  .badge{background:#f1f5ff;border-radius:999px;padding:8px 12px;font-weight:800}
+  .badge.green{background:#ecfdf5;color:var(--green)}
+  .badge.blue{background:#eff6ff;color:var(--blue)}
+  .badge.amber{background:#fff7ed;color:var(--amber)}
+  .badge.red{background:#fef2f2;color:var(--red)}
+  .meta{color:var(--muted);margin:6px 0 10px}
+  .metrics{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 12px}
+  .pill{background:var(--pill);padding:8px 12px;border-radius:12px;font-weight:700}
+  .acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .actBtn{flex:0 0 auto;border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;cursor:pointer}
+  .src{max-width:1200px;margin:10px auto 26px;padding:0 16px;color:var(--muted)}
+  footer{color:#94a3b8;text-align:center;margin:36px 0 16px}
+  .muted{color:var(--muted)}
 </style>
 </head>
 <body>
-<header>
-  <div class="brand">TripRadar</div>
-  <div class="sub">行前 1 分鐘｜建議旅遊分數 + 交通與災害風險</div>
-  <div class="toolbar">
-    <div class="pill" id="ts">更新時間：—</div>
-    <button class="btn" id="btnReload">重新抓取</button>
-  </div>
-</header>
-
-<main>
-  <div id="riskBar" class="riskbar">⚠️ 風險先知：—</div>
-
-  <div class="filterbar">
-    <label class="chk"><input type="checkbox" id="useLoc" checked/><b>使用所在址加權</b></label>
-    <label class="chk"><b>手動所在址：</b>
-      <select id="citySel">
-        <option>臺北市</option><option>新北市</option><option>桃園市</option>
-        <option>新竹市</option><option>臺中市</option><option>南投縣</option>
-        <option>嘉義縣</option><option>花蓮縣</option><option>高雄市</option>
-        <option>屏東縣</option><option>宜蘭縣</option><option>澎湖縣</option>
-        <option>金門縣</option><option>連江縣</option>
-      </select>
-    </label>
-  </div>
-
-  <div id="cards" class="grid"></div>
-
-  <div class="src">
-    <div class="muted" style="margin-bottom:8px;">資料來源（展示版本，已快取／模擬）：</div>
-    <div class="btns">
-      <span class="tag">CWB：天氣</span>
-      <span class="tag">MoENV：AQI</span>
-      <span class="tag">NCDR：災害CAP</span>
-      <span class="tag">TDX：轉乘/路況</span>
+  <header>
+    <div class="wrap">
+      <h1>TripRadar</h1>
+      <div class="sub">行前 1 分鐘｜建議旅遊分數 + 一句建議</div>
+      <div class="toolbar">
+        <button id="btnRefresh" class="btn">🔄 重新抓取</button>
+        <div id="txtTime" class="btn">🕒 更新時間：—</div>
+      </div>
     </div>
-  </div>
-</main>
+  </header>
 
-<div id="modal" class="modal-backdrop">
-  <div class="sheet">
-    <button class="close" id="closeSheet">關閉 ×</button>
-    <h3 id="sheetTitle">—</h3>
-    <div id="sheetBody"></div>
-  </div>
-</div>
+  <section class="row">
+    <div class="ctl">
+      <input id="useGeo" type="checkbox" checked />
+      <label for="useGeo"><b>使用所在地加權</b></label>
+    </div>
+    <div class="ctl">
+      <span class="muted">手動所在地：</span>
+      <select id="selCity">
+        <option>臺北市</option><option>新北市</option><option>桃園市</option>
+        <option>新竹市</option><option>新竹縣</option><option>苗栗縣</option>
+        <option>臺中市</option><option>彰化縣</option><option>南投縣</option>
+        <option>雲林縣</option><option>嘉義縣</option><option>嘉義市</option>
+        <option>臺南市</option><option>高雄市</option><option>屏東縣</option>
+        <option>宜蘭縣</option><option>花蓮縣</option><option>臺東縣</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="row">
+    <div class="chip">CWB：天氣（展示用假資料）</div>
+    <div class="chip">MoENV：AQI（展示用假資料）</div>
+    <div class="chip">NCDR：災害 CAP（展示用假資料）</div>
+    <div class="chip">TDX：轉乘 / 路況（展示用假資料）</div>
+  </section>
+
+  <section id="cards" class="grid"></section>
+
+  <div class="src wrap">資料來源：CWB F-C0032-001、MoENV aqi_p_432、NCDR CAP、TDX（此頁為展示版，實際競賽可切換成真 API）</div>
+  <footer>© 2025 TripRadar（DEMO）</footer>
 
 <script>
-// -------- 基本資料 --------
-const SPOTS=[
-{id:"alishan",name:"阿里山",county:"嘉義縣",lat:23.5,lng:120.8,web:"https://www.tbocc.gov.tw/"},
-{id:"taroko",name:"太魯閣",county:"花蓮縣",lat:24.16,lng:121.62,web:"https://www.taroko.gov.tw/"},
-{id:"sunmoon",name:"日月潭",county:"南投縣",lat:23.86,lng:120.91,web:"https://www.sunmoonlake.gov.tw/"},
-{id:"kenting",name:"墾丁國家公園",county:"屏東縣",lat:21.94,lng:120.78,web:"https://www.ktnp.gov.tw/"},
-{id:"penghu",name:"澎湖灣",county:"澎湖縣",lat:23.57,lng:119.57,web:"https://www.penghu-nsa.gov.tw/"},
-{id:"yushan",name:"玉山",county:"南投縣",lat:23.47,lng:120.95,web:"https://www.ysnp.gov.tw/"}
+/* =========================
+   0) 展示模式（不連外）
+   ========================= */
+const DEMO_MODE = true;
+
+/* =========================
+   1) 基本資料：13 處國家風景區
+   ========================= */
+const spots = [
+  { name: "阿里山",  region: "嘉義縣", lat: 23.508, lng: 120.81,  url: "https://www.ali-nsa.net/" },
+  { name: "太魯閣",  region: "花蓮縣", lat: 24.18,  lng: 121.49,  url: "https://www.taroko.gov.tw/" },
+  { name: "日月潭",  region: "南投縣", lat: 23.86,  lng: 120.91,  url: "https://www.sunmoonlake.gov.tw/" },
+  { name: "西拉雅",  region: "臺南市", lat: 23.18,  lng: 120.40,  url: "https://www.siraya-nsa.gov.tw/" },
+  { name: "花東縱谷",region: "花蓮縣", lat: 23.90,  lng: 121.54,  url: "https://www.erv-nsa.gov.tw/" },
+  { name: "東部海岸",region: "臺東縣", lat: 22.90,  lng: 121.16,  url: "https://www.eastcoast-nsa.gov.tw/" },
+  { name: "北海岸及觀音山",region:"新北市", lat: 25.28, lng: 121.56, url:"https://www.northguan-nsa.gov.tw/" },
+  { name: "茂林",    region: "高雄市", lat: 22.88,  lng: 120.68,  url: "https://www.maolin-nsa.gov.tw/" },
+  { name: "澎湖",    region: "澎湖縣", lat: 23.57,  lng: 119.56,  url: "https://www.penghu-nsa.gov.tw/" },
+  { name: "馬祖",    region: "連江縣", lat: 26.16,  lng: 119.93,  url: "https://www.matsu-nsa.gov.tw/" },
+  { name: "雲嘉南濱海",region:"雲林縣", lat: 23.37, lng: 120.15, url:"https://www.swcoast-nsa.gov.tw/" },
+  { name: "金門",    region: "金門縣", lat: 24.45,  lng: 118.39,  url: "https://www.kinmen-nsa.gov.tw/" },
+  { name: "東北角暨宜蘭海岸",region:"宜蘭縣", lat: 24.98, lng: 121.91, url:"https://www.necoast-nsa.gov.tw/" }
 ];
 
-const CAP_ALERTS=[
- {county:"花蓮縣",type:"雷暴",level:"橙色",time:"2025/10/30 09:30"},
- {county:"南投縣",type:"豪雨",level:"橙色",time:"2025/10/30 10:00"}
-];
-
-const TRAFFIC_MOCK={
- alishan:{factor:1.5,summary:"省道18線山區車多，彎道減速"},
- taroko:{factor:1.2,summary:"台8線局部施工改道"},
- sunmoon:{factor:1.0,summary:"路況順暢"}
+/* =========================
+   2) 展示用模擬資料（天氣 / AQI / 災害 / 路況）
+   ========================= */
+const weatherData = { // 每縣市：溫度、降雨機率、UV、AQI
+  "嘉義縣":{temp:24,pop:20,uv:6,aqi:45}, "花蓮縣":{temp:25,pop:30,uv:7,aqi:50},
+  "南投縣":{temp:23,pop:25,uv:7,aqi:40}, "臺南市":{temp:26,pop:10,uv:8,aqi:55},
+  "臺東縣":{temp:26,pop:15,uv:8,aqi:35}, "新北市":{temp:24,pop:20,uv:6,aqi:48},
+  "高雄市":{temp:27,pop:20,uv:9,aqi:60}, "澎湖縣":{temp:25,pop:10,uv:8,aqi:38},
+  "連江縣":{temp:20,pop:15,uv:5,aqi:30}, "雲林縣":{temp:25,pop:20,uv:7,aqi:50},
+  "金門縣":{temp:22,pop:10,uv:6,aqi:32}, "宜蘭縣":{temp:23,pop:35,uv:6,aqi:42}
 };
 
-const GEO_MOCK={
- taroko:{level:"orange",note:"中橫局部落石風險增高"},
- alishan:{level:"yellow",note:"連日降雨後山區土石易鬆動"}
+const disasterData = { // 0=無、1=注意、2=警報（簡化）
+  "嘉義縣":0,"花蓮縣":0,"南投縣":0,"臺南市":0,"臺東縣":0,"新北市":0,
+  "高雄市":0,"澎湖縣":0,"連江縣":0,"雲林縣":1,"金門縣":0,"宜蘭縣":0
 };
 
-const DEMO={baseTemp:24,basePop:20,baseAqi:45,baseUv:6};
+const trafficData = { // 0=順、1=車多、2=壅塞（簡化）
+  "嘉義縣":1,"花蓮縣":0,"南投縣":0,"臺南市":0,"臺東縣":0,"新北市":1,
+  "高雄市":1,"澎湖縣":0,"連江縣":0,"雲林縣":1,"金門縣":0,"宜蘭縣":1
+};
 
-// -------- 加權公式 --------
-function scoreOf({t,pop,aqi,uv}){
- let tempScore=100-Math.abs(23-t)*6;
- let rainScore=100-pop;
- let aqiScore=Math.max(0,100-aqi*0.8);
- let uvScore=70;
- return Math.round((tempScore*0.25+rainScore*0.35+aqiScore*0.25+uvScore*0.15));
-}
-function trafficPenalty(f){return Math.max(-15,Math.min(0,-15*(f-1)));}
-function geoPenalty(lv){if(lv==="orange")return -15;if(lv==="yellow")return -8;return 0;}
-function colorClass(s){if(s>=90)return"s-green";if(s>=75)return"s-blue";if(s>=60)return"s-amber";return"s-red";}
-function textByScore(s){if(s>=90)return"非常適合出遊";if(s>=75)return"適合出遊";if(s>=60)return"尚可出遊";return"建議改期";}
-function fmt(n){return Number(n).toFixed(0);}
-
-// -------- 畫面與互動 --------
-const elCards=document.getElementById("cards");
-const elCity=document.getElementById("citySel");
-const elUseLoc=document.getElementById("useLoc");
-const elTs=document.getElementById("ts");
-const riskBar=document.getElementById("riskBar");
-const modal=document.getElementById("modal");
-const sheetT=document.getElementById("sheetTitle");
-const sheetB=document.getElementById("sheetBody");
-document.getElementById("closeSheet").onclick=()=>modal.style.display="none";
-modal.addEventListener("click",e=>{if(e.target===modal)modal.style.display="none";});
-function nowTS(){
- const d=new Date();
- elTs.textContent=`更新時間：${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}`;
+/* =========================
+   3) 打分邏輯
+   ========================= */
+function baseScore({temp,pop,uv,aqi}){
+  let s = 75; // 以 75 為基準
+  // 溫度：離 23°C 每 ±1°C 扣 1 分，最多扣 10
+  s -= Math.min(10, Math.abs(temp-23)*1);
+  // 降雨：100% 扣 20 → 線性
+  s -= (pop/100)*20;
+  // AQI：每 +1 扣 0.8（AQI 50 約扣 40）
+  s -= (aqi)*0.8/2; // 降低一半影響（/2）以較符合旅遊感受
+  // UV：高 UV 不直接判定危險，給輕微 -3..0
+  if(uv>=9)s-=3; else if(uv>=7)s-=2; else if(uv>=6)s-=1;
+  return Math.max(0, Math.min(95, Math.round(s)));
 }
 
+function locationAdjust(spotRegion, userCity){
+  if(!document.getElementById('useGeo').checked) return 0;
+  if(!userCity) return 0;
+  // 同縣市 +5，近區 +2（簡化以字面判斷）
+  if(spotRegion.includes(userCity) || userCity.includes(spotRegion)) return +5;
+  const near = [
+    ["臺北市","新北市","基隆市","宜蘭縣"],
+    ["新北市","臺北市","基隆市","宜蘭縣","桃園市"],
+    ["臺中市","南投縣","彰化縣","苗栗縣"],
+    ["臺南市","高雄市","嘉義縣","雲林縣","屏東縣"]
+  ];
+  const line = near.find(g => g.includes(userCity));
+  if(line && line.some(x => spotRegion.includes(x))) return +2;
+  return 0;
+}
+
+function riskPenalty(spotRegion){
+  // 災害：注意 -5；警報 -15
+  const d = disasterData[spotRegion] ?? 0;
+  const pDis = d===2 ? -15 : d===1 ? -5 : 0;
+  // 路況：壅塞 -8；車多 -3
+  const t = trafficData[spotRegion] ?? 0;
+  const pTra = t===2 ? -8 : t===1 ? -3 : 0;
+  return pDis + pTra;
+}
+
+function finalScore(spotRegion, userCity, metrics){
+  const s0 = baseScore(metrics);
+  const adj = locationAdjust(spotRegion, userCity);
+  const pen = riskPenalty(spotRegion);
+  return Math.max(0, Math.min(100, s0 + adj + pen));
+}
+
+function colorOf(score){
+  if(score>=90) return {cls:"green", text:"非常適合出遊", emoji:"🟢"};
+  if(score>=75) return {cls:"blue",  text:"適合出遊",     emoji:"🔵"};
+  if(score>=60) return {cls:"amber", text:"尚可出遊",     emoji:"🟡"};
+  return {cls:"red",   text:"建議改期",     emoji:"🔴"};
+}
+
+/* =========================
+   4) 互動：地圖／導航／官網
+   ========================= */
+function openMapAt(lat,lng){
+  const ua=navigator.userAgent.toLowerCase();
+  const apple=`http://maps.apple.com/?ll=${lat},${lng}`;
+  const google=`https://maps.google.com/?q=${lat},${lng}`;
+  if(/iphone|ipad|macintosh/.test(ua)) window.open(apple,'_blank');
+  else window.open(google,'_blank');
+}
+function navTo(lat,lng){
+  const ua=navigator.userAgent.toLowerCase();
+  const apple=`http://maps.apple.com/?daddr=${lat},${lng}`;
+  const google=`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+  if(/iphone|ipad|macintosh/.test(ua)) window.open(apple,'_blank');
+  else window.open(google,'_blank');
+}
+
+/* =========================
+   5) 產生卡片
+   ========================= */
 function render(){
- nowTS();elCards.innerHTML="";
- const where=elCity.value;
- const hits=CAP_ALERTS.filter(a=>a.county===where);
- if(hits.length){riskBar.style.display="flex";riskBar.textContent=`⚠️ 風險先知：${hits.map(a=>a.county+" "+a.type+"("+a.level+")").join("、")} — ${hits[0].time}`;}
- else{riskBar.style.display="none";}
+  const container = document.getElementById('cards');
+  container.innerHTML = '';
+  const userCity = document.getElementById('selCity').value;
 
- SPOTS.forEach((p,i)=>{
-   const t=DEMO.baseTemp+(i%3-1);
-   const pop=DEMO.basePop+(i%4)*5;
-   const aqi=DEMO.baseAqi+(i%5)*3;
-   const uv=DEMO.baseUv;
-   let s=scoreOf({t,pop,aqi,uv});
+  spots.forEach(sp => {
+    const met = weatherData[sp.region] || {temp:24,pop:20,uv:6,aqi:45};
+    const score = finalScore(sp.region, userCity, met);
+    const color = colorOf(score);
 
-   if(elUseLoc.checked){
-     if(p.county===where)s=Math.min(100,s+5);
-     const island=["澎湖縣","金門縣","連江縣"];
-     if(island.includes(p.county)&&!island.includes(where))s=Math.max(0,s-5);
-   }
-   const cap=CAP_ALERTS.find(a=>a.county===p.county);
-   if(cap){s+=cap.level==="橙色"?-10:cap.level==="黃色"?-5:0;}
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="title">
+        <h3>${sp.name}</h3>
+        <div class="badge ${color.cls}">${color.emoji} 建議旅遊分數 ${score}</div>
+      </div>
+      <div class="meta">${sp.region}</div>
+      <div class="metrics">
+        <div class="pill">🌡️ ${met.temp}°C</div>
+        <div class="pill">🌧️ ${met.pop}%</div>
+        <div class="pill">☀️ UV ${met.uv}</div>
+        <div class="pill">🫧 AQI ${met.aqi}</div>
+      </div>
+      <div class="acts">
+        <button class="actBtn" data-act="pin">📍 一鍵到點</button>
+        <button class="actBtn" data-act="nav">🗺️ 地圖導航</button>
+        <a class="actBtn" href="${sp.url}" target="_blank" rel="noopener">📄 官方網站</a>
+      </div>
+    `;
+    // 綁定
+    card.querySelector('[data-act="pin"]').onclick = () => openMapAt(sp.lat, sp.lng);
+    card.querySelector('[data-act="nav"]').onclick = () => navTo(sp.lat, sp.lng);
 
-   const tf=(TRAFFIC_MOCK[p.id]?.factor??1.0);
-   s+=trafficPenalty(tf);
-   const geoLv=GEO_MOCK[p.id]?.level??"none";
-   s+=geoPenalty(geoLv);
-   s=Math.max(0,Math.min(100,Math.round(s)));
+    container.appendChild(card);
+  });
 
-   const capChip=cap?`<span class="risk-chip">⚠️${cap.type}(${cap.level})</span>`:"";
-   const trafficChip=tf>1.05?`<span class="risk-chip">🚧壅塞x${tf.toFixed(2)}</span>`:"";
-   const geoChip=geoLv!=="none"?`<span class="risk-chip">🪨${geoLv==="orange"?"土石流(橙)":"地災(黃)"}</span>`:"";
-
-   const card=document.createElement("section");card.className="card";
-   card.innerHTML=`
-     <div class="card-hd">
-       <div class="place">${p.name}</div>
-       <div class="county">${p.county}</div>
-       <div><span class="score-badge ${colorClass(s)}">建議旅遊分數 ${s}</span>${capChip}${trafficChip}${geoChip}</div>
-     </div>
-     <div class="indics">
-       <span class="chip">🌡️${fmt(t)}°C</span>
-       <span class="chip">🌧️${fmt(pop)}%</span>
-       <span class="chip">🫧AQI ${fmt(aqi)}</span>
-     </div>
-     <div class="ops">
-       <button class="action" onclick="openMap(${p.lat},${p.lng})">📍一鍵到點</button>
-       <button class="action" onclick="window.open('https://maps.google.com/?q=${p.lat},${p.lng}')">🗺️地圖導航</button>
-       <button class="action" onclick="showTransit('${p.id}','${p.name}')">🚆轉乘建議</button>
-       <button class="action" onclick="showSnap('${p.id}','${p.name}')">🛰️路況快照</button>
-       <button class="action" onclick="window.open('${p.web}')">🏛️景區官網</button>
-     </div>
-     <div class="src muted">一句建議：${textByScore(s)}。</div>`;
-   elCards.appendChild(card);
- });
+  // 更新時間
+  const t = new Date();
+  const pad = n => n.toString().padStart(2,'0');
+  document.getElementById('txtTime').textContent =
+    `🕒 更新時間：${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())} ${pad(t.getHours())}:${pad(t.getMinutes())}`;
 }
 
-function openMap(lat,lng){
- const ua=navigator.userAgent.toLowerCase();
- const isApple=/iphone|ipad|macintosh/.test(ua);
- window.open(isApple?`http://maps.apple.com/?ll=${lat},${lng}`:`https://maps.google.com/?q=${lat},${lng}`,"_blank");
-}
-function showTransit(id,name){
- sheetT.textContent=`${name}｜轉乘建議（模擬）`;
- sheetB.innerHTML=`<div class="step"><div class="k">1</div><div>主要城市搭乘大眾運輸至景區門口</div></div>
- <div class="step"><div class="k">2</div><div>步行 5–10 分，注意末班時間</div></div>`;
- modal.style.display="flex";
-}
-function showSnap(id,name){
- const tf=(TRAFFIC_MOCK[id]?.factor??1.0);
- const geo=GEO_MOCK[id];
- const free=60,eta=Math.round(free*tf);
- sheetT.textContent=`${name}｜路況快照`;
- sheetB.innerHTML=`
+/* =========================
+   6) 事件
+   ========================= */
+document.getElementById('btnRefresh').addEventListener('click', render);
+document.getElementById('selCity').addEventListener('change', render);
+document.getElementById('useGeo').addEventListener('change', render);
+
+// 首次載入
+render();
+</script>
+</body>
+</html>
